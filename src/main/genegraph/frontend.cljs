@@ -68,14 +68,24 @@
        [view @match]))
    [:pre @match]])
 
+(re-frame/reg-event-db ::initialize-db
+  (fn [db _]
+    (if db
+      db
+      {:current-route nil})))
+
 (defn ^:dev/after-load render-root []
   (println "[main] reloaded lib:")
   (routes/init-routes!)  
-  (.render root (r/as-element [conflict-list/conflict-list])))
+  #_(.render root (r/as-element [conflict-list/conflict-list]))
+  (.render root (r/as-element [routes/router-component
+                               {:router routes/router}])))
 
 (defn ^:export init []
+  (re-frame/clear-subscription-cache!)
   (re-frame/dispatch [::re-graph/init
                       {:ws nil #_{:url BACKEND_WS}
                        :http {:url BACKEND_HTTP
                               :impl {:headers {"Access-Control-Allow-Credentials" true}}}}])
+  (re-frame/dispatch-sync [::initialize-db])
   (render-root))

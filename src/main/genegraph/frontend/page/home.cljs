@@ -1,7 +1,7 @@
 (ns genegraph.frontend.page.home
   (:require [reitit.frontend.easy :as rfe]))
 
-(defn home-page []
+(defn home []
   [:div
    [:h2 "Welcome to frontend"]
 
