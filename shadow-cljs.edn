@@ -6,6 +6,7 @@
 
  :dependencies
  [[re-frame "1.4.3"]
+  [re-graph "0.2.0"]
   [metosin/reitit-frontend "0.7.0"]]
 
  :dev-http {8080 "public"}

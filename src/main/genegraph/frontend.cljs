@@ -3,11 +3,20 @@
             [reagent.core :as reagent]
             [goog.dom :as gdom]
             [reagent.dom :as rdom]
+            [reagent.core :as r]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
-            [re-frame.core :as re-frame]))
+            [re-frame.core :as re-frame]
+            [re-graph.core :as re-graph]
+            [genegraph.frontend.routes :as routes]
+            [genegraph.frontend.page.conflict-list :as conflict-list]))
+
+(enable-console-print!)
 
 (defonce root (createRoot (gdom/getElement "app")))
+
+(goog-define BACKEND_WS "ws://localhost:8888/ws")
+(goog-define BACKEND_HTTP "http://localhost:8888/api")
 
 (defonce match (reagent/atom nil))
 
@@ -59,24 +68,14 @@
        [view @match]))
    [:pre @match]])
 
-(def routes
-  [["/"
-    {:name ::frontpage
-     :view home-page}]
+(defn ^:dev/after-load render-root []
+  (println "[main] reloaded lib:")
+  (routes/init-routes!)  
+  (.render root (r/as-element [conflict-list/conflict-list])))
 
-   ["/about"
-    {:name ::about
-     :view about-page}]
-
-   ["/item/:id"
-    {:name ::item
-     :view item-page
-     :parameters {:path {:id int?}}}]])
-
-(defn init []
-  (rfe/start!
-   (rf/router routes)
-   (fn [m] (reset! match m))
-   ;; set to false to enable HistoryAPI
-   {:use-fragment true})
-  (rdom/render [current-page] (.getElementById js/document "root")))
+(defn ^:export init []
+  (re-frame/dispatch [::re-graph/init
+                      {:ws nil #_{:url BACKEND_WS}
+                       :http {:url BACKEND_HTTP
+                              :impl {:headers {"Access-Control-Allow-Credentials" true}}}}])
+  (render-root))
