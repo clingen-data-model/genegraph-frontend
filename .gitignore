@@ -32,6 +32,7 @@ pom.xml.asc
 
 # build artifacts
 .clerk/
+public/css/main.css
 
 # shadow-cljs stuff
 .shadow-cljs
