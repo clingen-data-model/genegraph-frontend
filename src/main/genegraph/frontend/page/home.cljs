@@ -1,16 +1,219 @@
 (ns genegraph.frontend.page.home
-  (:require [reitit.frontend.easy :as rfe]))
+  (:require [re-frame.core :as re-frame]
+            [re-graph.core :as re-graph]
+            [reitit.frontend.easy :as rfe]))
+
+
+(def conflicts-query
+  "{
+  conflicts {
+    iri
+    label
+    classification {
+      iri
+      label
+    }
+    submitter {
+      iri
+      label
+    }
+    date
+    conflictingAssertions {
+      iri
+      gene {
+        label
+        iri
+      }
+    }
+  }
+}
+")
+
+
+(re-frame/reg-event-db
+ ::recieve-conflict-list
+ (fn [db [_ result]]
+   (js/console.log "Recieved conflict list")
+   (assoc db ::conflicts (get-in result [:response :data :conflicts]))))
+
+(re-frame/reg-event-fx
+ ::request-conflict-list
+ (fn [_ _]
+   (js/console.log "Requesting conflict list ")
+   {:fx [[:dispatch
+          [::re-graph/query
+           {:id ::conflict-list
+            :query conflicts-query
+            :variables {}
+            :callback [::recieve-conflict-list]}]]]}))
+
+(re-frame/reg-event-db
+ ::curate-assertion
+ (fn [db [_ assertion]]
+   (assoc db ::currently-curating assertion)))
+
+(re-frame/reg-event-db
+ ::save-curation
+ (fn [db [_ assertion]]
+   (assoc db
+          ::currently-curating nil
+          ::conflicts (->> (::conflicts db)
+                           (remove #(= assertion (:iri %)))
+                           (into [])))))
+
+(re-frame/reg-sub
+ ::currently-curating
+ :-> ::currently-curating)
+
+(re-frame/reg-sub
+ ::conflicts
+ :-> ::conflicts)
+
+#_(defn home []
+    [:div
+     [:h2 "Welcome to frontend"]
+
+     [:button
+      {:type "button"
+       :on-click #(rfe/push-state ::item {:id 3})}
+      "Item 3"]
+
+     [:button
+      {:type "button"
+       :on-click #(rfe/replace-state ::item {:id 4})}
+      "Replace State Item 4"]])
+
+
+(defn curation-dialog [assertion]
+  [:div
+   {:class "mb-8"}
+   [:div
+    {:class "w-80 mt-4"}
+    [:label
+     {:for "error",
+      :class "sr-only"}
+     "error"]
+    [:select
+     {:id "error",
+      :name "error",
+      :class
+      "mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"}
+     [:option "no assessment"]
+     [:option "incorrect due to dosage map conflict"]
+     [:option "error in variant description"] 
+     [:option "classification is correct"]]]
+   [:div
+    [:label
+     {:for "comment",
+      :class "block text-sm font-medium leading-6 text-gray-900 sr-only"}
+     "Add your comment"]
+    [:div
+     {:class "mt-2"}
+     [:textarea
+      {:rows "4",
+       :name "comment",
+       :id "comment",
+       :placeholder "comment"
+       :class
+       "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"}]]]
+   [:div
+    [:button
+     {:type "button",
+      :on-click #(re-frame/dispatch [::save-curation
+                                     (:iri assertion)])
+      :class
+      "mt-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
+     "save"]
+    [:button
+     {:type "button",
+      :on-click #(re-frame/dispatch [::curate-assertion
+                                     nil])
+      :class
+      "mt-2 ml-4 rounded-md bg-gray-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
+     "cancel"]]])
+
+(defn gene-card [a]
+  [:div
+   {:class "font-medium text-rose-900 flex"}
+   (get-in a [:gene :label])])
+
+(def pencil-square-icon
+  [:svg
+   {:xmlns "http://www.w3.org/2000/svg",
+    :fill "none",
+    :viewBox "0 0 24 24",
+    :stroke-width "1.5",
+    :stroke "currentColor",
+    :class "size-6"}
+   [:path
+    {:stroke-linecap "round",
+     :stroke-linejoin "round",
+     :d
+     "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"}]])
+
+(defn conflict-list []
+  (let [currently-curating @(re-frame/subscribe [::currently-curating])]
+    [:ul
+     {:role "list", :class "divide-y divide-gray-100"}
+     (for [i (->> @(re-frame/subscribe [::conflicts])
+                  (filter #(get-in % [:classification :label]))
+                  (take 5))]
+       ^{:key i}
+       #_"flex justify-between gap-x-6 py-5"
+       [:li
+        {:class "py-8"}
+        [:div
+         {:class "flex gap-x-6"}
+         [:div
+          {:class "flex w-1/2 gap-x-4"}
+          [:div
+           {:class "min-w-0 flex-auto"}
+           [:p
+            {:class "text-sm font-semibold leading-6 text-gray-900"}
+            [:a {:href (:iri i) :target "_blank"} (:label i)]]
+           [:p
+            {:class "text-sm leading-6 text-gray-500"}
+            (get-in i [:classification :label])]
+           [:p
+            {:class "mt-1 truncate text-xs leading-5 text-gray-500"}
+            (get-in i [:submitter :label])]
+           [:p
+            {:class "mt-1 truncate text-xs leading-5 text-gray-500"}
+            (:date i)]]]
+         ;; gene grid
+         [:div
+          {:class "w-1/4"}
+          [:div
+           {:class "text-gray-700 text-sm font-light"}
+           "Dosage conflicts"]
+          [:div
+           {:class #_"grid grid-cols-1 gap-2 py-1 sm:grid-cols-4"
+            "flex gap-2 py-1 flex-wrap"}
+           (for [a (take 20 (:conflictingAssertions i))]
+             (with-meta 
+               (gene-card a)
+               {:key [i a]}))]]
+         [:div
+          {:on-click #(re-frame/dispatch [::curate-assertion
+                                          (:iri i)])}
+          [:span pencil-square-icon "curate"]]]
+        (when (= (:iri i) currently-curating)
+          (curation-dialog i))])]))
 
 (defn home []
   [:div
-   [:h2 "Welcome to frontend"]
+   {:class "py-10"}
+   [:header
+    [:div
+     {:class "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"}
+     [:h1
+      {:class
+       "text-3xl font-bold leading-tight tracking-tight text-gray-900"}
+      "Conflict List"]]]
+   [:main
+    [:div
+     {:class "mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"}
+     (conflict-list)]
+    #_[:div [:pre (with-out-str (cljs.pprint/pprint @(re-frame/subscribe [::currently-curating])))]]]])
 
-   [:button
-    {:type "button"
-     :on-click #(rfe/push-state ::item {:id 3})}
-    "Item 3"]
 
-   [:button
-    {:type "button"
-     :on-click #(rfe/replace-state ::item {:id 4})}
-    "Replace State Item 4"]])

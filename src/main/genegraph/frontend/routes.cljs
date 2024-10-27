@@ -4,6 +4,7 @@
             [reitit.core :as r]
             [reitit.frontend.controllers :as rfc]
             [re-frame.core :as re-frame]
+            [genegraph.frontend.nav :as nav]
             [genegraph.frontend.page.home :as home]
             [genegraph.frontend.page.conflict-list :as conflict-list]))
 
@@ -71,9 +72,12 @@
      :controllers
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
-       :start (fn [& params](js/console.log "Entering home page"))
+       :start (fn [& params]
+                (js/console.log "Entering home page")
+                (re-frame/dispatch [::home/request-conflict-list]))
        ;; Teardown can be done here.
-       :stop  (fn [& params] (js/console.log "Leaving home page"))}]}]
+       :stop  (fn [& params]
+                (js/console.log "Leaving home page"))}]}]
    ["sub-page1"
     {:name      ::sub-page1
      :view      sub-page1
@@ -127,9 +131,10 @@
       ;; Create a normal links that user can click
       [:a {:href (href route-name)} text]])])
 
+#_"min-h-full mx-auto max-w-7xl sm:px-6 lg:px-8"
 (defn router-component [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::current-route])]
-    [:div
-     [nav {:router router :current-route current-route}]
+    [:div {:class "container sm:px-6 lg:px-8"}
+     [nav/nav]
      (when current-route
        [(-> current-route :data :view)])]))
