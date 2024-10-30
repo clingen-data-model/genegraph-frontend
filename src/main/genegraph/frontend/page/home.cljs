@@ -3,6 +3,19 @@
             [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]))
 
+(def clock-icon
+  [:svg
+   {:xmlns "http://www.w3.org/2000/svg",
+    :fill "none",
+    :viewBox "0 0 24 24",
+    :stroke-width "1.5",
+    :stroke "currentColor",
+    :class "size-6"}
+   [:path
+    {:stroke-linecap "round",
+     :stroke-linejoin "round",
+     :d "M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"}]])
+
 (def cg-root
   "http://dataexchange.clinicalgenome.org/terms/")
 
@@ -59,14 +72,56 @@
  (fn [db [_ assertion]]
    (assoc db ::currently-curating assertion)))
 
+(def save-curation-mutation
+  "mutation (
+  $subject: String
+  $agent: String
+  $description: String
+  $classification: String
+  $evidence: [String]
+) {
+  createCuration(
+    subject: $subject
+    agent: $agent
+    description: $description
+    classification: $classification
+    evidence: $evidence
+  ) {
+    iri
+    subject {iri}
+    classification
+    description
+    date
+  }
+}
+")
+
 (re-frame/reg-event-db
+ ::recieve-save-result
+ (fn [db [_ result]]
+   (assoc db ::save-result result)))
+
+(re-frame/reg-event-fx
  ::save-curation
- (fn [db [_ assertion]]
-   (assoc db
-          ::currently-curating nil
-          ::conflicts (->> (::conflicts db)
-                           (remove #(= assertion (:iri %)))
-                           (into [])))))
+ (fn [{:keys [db]} [_ subject]]
+   {:db (assoc db
+               ::currently-curating nil
+               ::conflicts (->> (::conflicts db)
+                                (remove #(= subject (:iri %)))
+                                (into [])))
+    :fx [[:dispatch
+          [::re-graph/mutate
+           {:id ::save-curation
+            :query save-curation-mutation
+            :variables (assoc (get-in db [::curations subject])
+                              :subject subject
+                              :agent (str
+                                      "https//clingen.app/users/"
+                                      (::current-user db))
+                              :evidence (->> (::conflicts db)
+                                             (filter #(= subject (:iri %)))
+                                             (mapcat #(map :iri (:conflictingAssertions %)))))
+            :callback [::recieve-save-result]}]]]}))
 
 (re-frame/reg-event-db
  ::edit-curation
@@ -130,9 +185,9 @@
         "mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
         :on-change (fn [e] (re-frame/dispatch [::edit-curation
                                                (:iri assertion)
-                                               :assertion
+                                               :classification
                                                (-> e .-target .-value)]))
-        :value (get curation :assertion (str cg-root "NoAssessment"))}
+        :value (get curation :classification (str cg-root "NoAssessment"))}
        [:option
         {:value (str cg-root "NoAssessment")}
         "no assessment"]
@@ -161,14 +216,13 @@
          "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
          :on-change (fn [e] (re-frame/dispatch [::edit-curation
                                                 (:iri assertion)
-                                                :comment
+                                                :description
                                                 (-> e .-target .-value)]))
-         :value (:comment curation)}]]]
+         :value (:description curation)}]]]
      [:div
       [:button
        {:type "button",
-        :on-click #(re-frame/dispatch [::save-curation
-                                       (:iri assertion)])
+        :on-click #(re-frame/dispatch [::save-curation (:iri assertion)])
         :class
         "mt-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
        "save"]
@@ -265,7 +319,7 @@
     [:div
      {:class "mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"}
      (conflict-list)]
-    #_[:div [:pre (with-out-str (cljs.pprint/pprint @(re-frame/subscribe [::all-curations])))]]]])
+    #_[:div [:pre (with-out-str (cljs.pprint/pprint @(re-frame/subscribe [::conflicts])))]]]])
 
 (defn login []
   [:div
@@ -285,8 +339,7 @@
         ^{:key id}
         [:li
          {:on-click #(re-frame/dispatch [::set-current-user id])}
-         name])]]
-    #_[:div [:pre (with-out-str (cljs.pprint/pprint @(re-frame/subscribe [::all-curations])))]]]])
+         name])]]]])
 
 (defn home []
   (if @(re-frame/subscribe [::current-user])
