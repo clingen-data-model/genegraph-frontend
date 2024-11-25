@@ -77,7 +77,6 @@
 (defn ^:dev/after-load render-root []
   (println "[main] reloaded lib:")
   (routes/init-routes!)  
-  #_(.render root (r/as-element [conflict-list/conflict-list]))
   (.render root (r/as-element [routes/router-component
                                {:router routes/router}])))
 

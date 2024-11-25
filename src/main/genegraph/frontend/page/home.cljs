@@ -22,28 +22,81 @@
 (def users
   {1 "Tasha"
    2 "Tracy"
-   3 "Tristan"})
+   3 "Tristan"}) 
 
 (def conflicts-query
   "{
   conflicts {
-    iri
-    label
-    classification {
-      iri
-      label
-    }
-    submitter {
-      iri
-      label
-    }
     date
-    conflictingAssertions {
-      iri
-      gene {
+    iri
+    curie
+    contributions {
+      agent {
+        curie
         label
-        iri
       }
+      role {
+        curie
+        label
+      }
+      date
+    }
+    conflictingAssertions {
+      curie
+      iri
+      contributions {
+        role {
+          curie
+          label
+        }
+        date
+      }
+      subject {
+        curie
+        ... on GeneticConditionMechanismProposition {
+          feature {
+            curie
+            label
+          }
+          mechanism {
+            label
+            curie
+          }
+          condition {
+            label
+            curie
+          }
+        }
+      }
+    }
+    subject {
+      curie
+      iri
+      ... on VariantPathogenicityProposition {
+        variant {
+          __typename
+          curie
+          label
+          ... on CanonicalVariant {
+            copyChange {
+              label
+              curie
+            }
+            includedVariants {
+              ... on CopyNumberChange {
+                copyChange {
+                  label
+                  curie
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    classification {
+      curie
+      label
     }
   }
 }
@@ -80,7 +133,7 @@
   $classification: String
   $evidence: [String]
 ) {
-  createCuration(
+  createAssertionAnnotation(
     subject: $subject
     agent: $agent
     description: $description
@@ -88,10 +141,6 @@
     evidence: $evidence
   ) {
     iri
-    subject {iri}
-    classification
-    description
-    date
   }
 }
 ")
@@ -218,7 +267,7 @@
                                                 (:iri assertion)
                                                 :description
                                                 (-> e .-target .-value)]))
-         :value (:description curation)}]]]
+         #_#_:value (:description curation)}]]] ; results in laggy input
      [:div
       [:button
        {:type "button",
@@ -234,10 +283,27 @@
         "mt-2 ml-4 rounded-md bg-gray-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
        "cancel"]]]))
 
-(defn gene-card [a]
-  [:div
-   {:class "font-medium text-rose-900 flex"}
-   (get-in a [:gene :label])])
+(defn approval-date [c]
+  (->> (:contributions c)
+       (filter #(= "CG:Approver" (get-in % [:role :curie])))
+       (map :date)
+       first))
+
+(defn old-dosage-curation? [c]
+  (-> c
+      approval-date
+      (compare "2020-01-01")
+      pos-int?
+      not))
+
+(defn dosage-curation-card [a]
+  (let [is-old (old-dosage-curation? a)]
+    [:div
+     (if is-old
+         {:class "font-medium text-gray-400 flex"}
+       {:class "font-medium text-rose-900 flex"})
+     (get-in a [:subject :feature :label])
+     (when is-old clock-icon)]))
 
 (def pencil-square-icon
   [:svg
@@ -253,55 +319,66 @@
      :d
      "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"}]])
 
-(defn conflict-list []
-  (let [currently-curating @(re-frame/subscribe [::currently-curating])]
-    [:ul
-     {:role "list", :class "divide-y divide-gray-100"}
+(defn submitter [i]
+  (->> (:contributions i)
+       (map :agent)
+       first))
+
+(defn conflict-item [i]
+  [:div
+   {:class "flex gap-x-6"
+    :on-click  #(re-frame/dispatch [::curate-assertion
+                                    (:iri i)])}
+   [:div
+    {:class "flex w-1/2 gap-x-4"}
+    [:div
+     {:class "min-w-0 flex-auto"}
+     [:p
+      {:class "text-sm font-semibold leading-6 text-gray-900"}
+      [:a {:href (:iri i) :target "_blank"}
+       (get-in i [:subject :variant :label])]]
+     [:p
+      {:class "text-sm leading-6 text-gray-500"}
+      (get-in i [:classification :label])]
+     [:div
+      {:class "mt-1 truncate text-xs leading-5 text-gray-500"}
+      [:span
+       {:class "flex gap-8"}
+       [:div (:date i)]
+       [:div (:label (submitter i))]]]]]
+   ;; gene grid
+   [:div
+    {:class "w-1/4"}
+    [:div
+     {:class "text-gray-700 text-sm font-light"}
+     "Dosage conflicts"]
+    [:div
+     {:class #_"grid grid-cols-1 gap-2 py-1 sm:grid-cols-4"
+      "flex gap-2 py-1 flex-wrap"}
      (doall
-      (for [i (->> @(re-frame/subscribe [::conflicts])
+      (for [a (take 20 (:conflictingAssertions i))]
+        (with-meta
+          (dosage-curation-card a)
+          {:key [i a]})))]]
+   [:div
+    {:on-click #(re-frame/dispatch [::curate-assertion
+                                    (:iri i)])}
+    [:span pencil-square-icon]]])
+
+(defn conflict-list []
+  (let [currently-curating @(re-frame/subscribe [::currently-curating])
+        conflicts @(re-frame/subscribe [::conflicts])]
+    [:ul
+     {:role "list", :divide "class-y divide-gray-100"}
+     (doall
+      (for [i (->> conflicts
                    (filter #(get-in % [:classification :label]))
-                   (take 5))]
+                   (sort-by #(get-in % [:subject :variant :label]))
+                   (take 50))]
         ^{:key i}
         [:li
          {:class "py-8"}
-         [:div
-          {:class "flex gap-x-6"
-           :on-click  #(re-frame/dispatch [::curate-assertion
-                                           (:iri i)])}
-          [:div
-           {:class "flex w-1/2 gap-x-4"}
-           [:div
-            {:class "min-w-0 flex-auto"}
-            [:p
-             {:class "text-sm font-semibold leading-6 text-gray-900"}
-             [:a {:href (:iri i) :target "_blank"} (:label i)]]
-            [:p
-             {:class "text-sm leading-6 text-gray-500"}
-             (get-in i [:classification :label])]
-            [:p
-             {:class "mt-1 truncate text-xs leading-5 text-gray-500"}
-             (get-in i [:submitter :label])]
-            [:p
-             {:class "mt-1 truncate text-xs leading-5 text-gray-500"}
-             (:date i)]]]
-          ;; gene grid
-          [:div
-           {:class "w-1/4"}
-           [:div
-            {:class "text-gray-700 text-sm font-light"}
-            "Dosage conflicts"]
-           [:div
-            {:class #_"grid grid-cols-1 gap-2 py-1 sm:grid-cols-4"
-             "flex gap-2 py-1 flex-wrap"}
-            (doall
-             (for [a (take 20 (:conflictingAssertions i))]
-               (with-meta 
-                 (gene-card a)
-                 {:key [i a]})))]]
-          [:div
-           {:on-click #(re-frame/dispatch [::curate-assertion
-                                           (:iri i)])}
-           [:span pencil-square-icon]]]
+         (conflict-item i)
          (when (= (:iri i) currently-curating)
            (curation-dialog i))]))]))
 

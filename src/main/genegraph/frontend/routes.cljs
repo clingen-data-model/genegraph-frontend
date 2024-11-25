@@ -6,6 +6,7 @@
             [re-frame.core :as re-frame]
             [genegraph.frontend.nav :as nav]
             [genegraph.frontend.page.home :as home]
+            [genegraph.frontend.page.annotations :as annotations]
             [genegraph.frontend.page.conflict-list :as conflict-list]))
 
 ;;; Effects ;;;
@@ -66,7 +67,7 @@
 (def routes
   ["/"
    [""
-    {:name      ::home
+    {:name      :routes/home
      :view      home/home
      :link-text "Home"
      :controllers
@@ -75,6 +76,19 @@
        :start (fn [& params]
                 (js/console.log "Entering home page")
                 (re-frame/dispatch [::home/request-conflict-list]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving home page"))}]}]
+   ["annotations"
+    {:name      :routes/annotations
+     :view      annotations/annotations
+     :link-text "Annotations"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering annotations page")
+                (re-frame/dispatch [::annotations/request-annotation-list]))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving home page"))}]}]
@@ -106,19 +120,6 @@
     router
     on-navigate
     {:use-fragment true}))
-
-;; Nav from demostration -- keeping for now for
-;; reference purposes
-#_(defn nav [{:keys [router current-route]}]
-    [:ul
-     (for [route-name (r/route-names router)
-           :let       [route (r/match-by-name router route-name)
-                       text (-> route :data :link-text)]]
-       [:li {:key route-name}
-        (when (= route-name (-> current-route :data :name))
-          "> ")
-        ;; Create a normal links that user can click
-        [:a {:href (href route-name)} text]])])
 
 (defn nav [{:keys [router current-route]}]
   [:ul
