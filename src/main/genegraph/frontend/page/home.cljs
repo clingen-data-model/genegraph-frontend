@@ -348,7 +348,7 @@
        [:div (:label (submitter i))]]]]]
    ;; gene grid
    [:div
-    {:class "w-1/4"}
+    {:class "w-1/2"}
     [:div
      {:class "text-gray-700 text-sm font-light"}
      "Dosage conflicts"]
@@ -359,11 +359,7 @@
       (for [a (take 20 (:conflictingAssertions i))]
         (with-meta
           (dosage-curation-card a)
-          {:key [i a]})))]]
-   [:div
-    {:on-click #(re-frame/dispatch [::curate-assertion
-                                    (:iri i)])}
-    [:span pencil-square-icon]]])
+          {:key [i a]})))]]])
 
 (defn conflict-list []
   (let [currently-curating @(re-frame/subscribe [::currently-curating])
