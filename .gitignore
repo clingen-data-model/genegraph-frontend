@@ -38,3 +38,5 @@ public/css/main.css
 .shadow-cljs
 node_modules/
 public/js/
+
+.firebase/**

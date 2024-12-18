@@ -235,8 +235,10 @@
         :on-change (fn [e] (re-frame/dispatch [::edit-curation
                                                (:iri assertion)
                                                :classification
-                                               (-> e .-target .-value)]))
-        :value (get curation :classification (str cg-root "NoAssessment"))}
+                                               (-> e .-target .-value)]))}
+       [:option
+        {:value ""}
+        "choose an option"]
        [:option
         {:value (str cg-root "NoAssessment")}
         "no assessment"]
