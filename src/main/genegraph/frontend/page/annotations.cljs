@@ -173,6 +173,16 @@
  ::annotated-assertions
  :-> ::annotated-assertions)
 
+(re-frame/reg-event-db
+ ::set-active-annotation
+ (fn [db [_ active-annotation]]
+   (js/console.log "active-annotation " active-annotation)
+   (assoc db ::active-annotation active-annotation)))
+
+(re-frame/reg-sub
+ ::active-annotation
+ :-> ::active-annotation)
+
 (defn authorship [a]
   (first
    (filter #(= "CG:Author"
@@ -219,13 +229,19 @@
 
 (defn annotation [a]
   (let [author (authorship a)
-        classification  (get-in a [:classification :curie])]
+        classification  (get-in a [:classification :curie])
+        active-annotation @(re-frame/subscribe [::active-annotation])]
     ^{:key (:iri a)}
-    [:div {:class (str "flex gap-4 rounded-lg m-1 py-1 px-3 "
-                       (get-in curation-reason [classification :color]))}
-     [:div (get-in curation-reason [classification :icon])]
-     [:div (get-in curation-reason [classification :text])]
-     [:div (user-name (:agent author))]]))
+    [:div
+     [:div {:class (str "flex gap-4 rounded-lg m-1 py-1 px-3 "
+                        (get-in curation-reason [classification :color]))
+            ;; active annotation not currently used
+            :on-click #(re-frame/dispatch [::set-active-annotation (:iri a)])}
+      [:div (get-in curation-reason [classification :icon])]
+      [:div (get-in curation-reason [classification :text])]
+      [:div (user-name (:agent author))]]
+      [:div {:class "px-8 py-1"}
+       (:description a)]]))
 
 (defn assertion [i]
   [:div
@@ -236,7 +252,7 @@
      {:class "min-w-0 flex-auto"}
      [:p
       {:class "text-sm font-semibold leading-6 text-gray-900"}
-      [:a {:href (:iri i) :target "_blank"}
+      [:a :href
        (get-in i [:subject :variant :label])]]
      [:p
       {:class "text-sm leading-6 text-gray-500"}
@@ -248,10 +264,12 @@
        [:div (:date i)]
        [:div (:label (submitter i))]]]]]
    [:div
+    {:class "w-1/2"}
     [:div
      {:class "text-gray-700 text-sm font-light"}
-     (for [a (:annotations i)]
-       (annotation a))]
+     (doall
+      (for [a (:annotations i)]
+        (annotation a)))]
     
     [:div
      {:class #_"grid grid-cols-1 gap-2 py-1 sm:grid-cols-4"

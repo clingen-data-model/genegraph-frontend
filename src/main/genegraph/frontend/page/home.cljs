@@ -1,7 +1,8 @@
 (ns genegraph.frontend.page.home
   (:require [re-frame.core :as re-frame]
             [re-graph.core :as re-graph]
-            [reitit.frontend.easy :as rfe]))
+            [reitit.frontend.easy :as rfe]
+            [genegraph.frontend.user :as user]))
 
 (def clock-icon
   [:svg
@@ -413,11 +414,11 @@
       (for [[id name] users]
         ^{:key id}
         [:li
-         {:on-click #(re-frame/dispatch [::set-current-user id])}
+         {:on-click #(re-frame/dispatch [::user/set-current-user id])}
          name])]]]])
 
 (defn home []
-  (if @(re-frame/subscribe [::current-user])
+  (if @(re-frame/subscribe [::user/current-user])
     (show-conflict-list)
     (login)))
 

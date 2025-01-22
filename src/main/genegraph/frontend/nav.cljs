@@ -1,6 +1,7 @@
 (ns genegraph.frontend.nav
   (:require [re-frame.core :as re-frame]
-            [reitit.frontend.easy :as rfe]))
+            [reitit.frontend.easy :as rfe]
+            [genegraph.frontend.user :as user]))
 
          (comment
            "Current: \"border-indigo-500 text-gray-900\", Default: \"border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700\"")
@@ -46,8 +47,8 @@
          [:span {:class "absolute -inset-1.5"}]
          [:span {:class "sr-only"} "View notifications"]
          (get
-          genegraph.frontend.page.home/users
-          @(re-frame/subscribe [:genegraph.frontend.page.home/current-user]))
+          user/users
+          @(re-frame/subscribe [::user/current-user]))
          #_[:svg
             {:class "h-6 w-6",
              :fill "none",
