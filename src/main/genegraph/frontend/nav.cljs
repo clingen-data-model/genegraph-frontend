@@ -19,7 +19,7 @@
   (let [current-route @(re-frame/subscribe
                         [:genegraph.frontend.routes/current-route])]
     [:nav
-     {:class "bg-white shadow"}
+     {:class "bg-white shadow-sm"}
      [:div
       {:class "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"}
       [:div
@@ -27,7 +27,7 @@
        [:div
         {:class "flex"}
         [:div
-         {:class "flex flex-shrink-0 items-center"}
+         {:class "flex shrink-0 items-center"}
          [:img
           {:class "h-8 w-auto",
            :src
@@ -43,7 +43,7 @@
         [:button
          {:type "button",
           :class
-          "relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"}
+          "relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"}
          [:span {:class "absolute -inset-1.5"}]
          [:span {:class "sr-only"} "View notifications"]
          (get
@@ -69,7 +69,7 @@
           [:button
            {:type "button",
             :class
-            "relative flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+            "relative flex rounded-full bg-white text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
             :id "user-menu-button",
             :aria-expanded "false",
             :aria-haspopup "true"}
@@ -84,7 +84,7 @@
            "Dropdown menu, show/hide based on menu state.\n\n            Entering: \"transition ease-out duration-200\"\n              From: \"transform opacity-0 scale-95\"\n              To: \"transform opacity-100 scale-100\"\n            Leaving: \"transition ease-in duration-75\"\n              From: \"transform opacity-100 scale-100\"\n              To: \"transform opacity-0 scale-95\"")
          #_[:div
             {:class
-             "absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none",
+             "absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden",
              :role "menu",
              :aria-orientation "vertical",
              :aria-labelledby "user-menu-button",
@@ -117,7 +117,7 @@
         [:button
          {:type "button",
           :class
-          "relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500",
+          "relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-indigo-500",
           :aria-controls "mobile-menu",
           :aria-expanded "false"}
          [:span {:class "absolute -inset-0.5"}]
@@ -182,7 +182,7 @@
        [:div
         {:class "flex items-center px-4"}
         [:div
-         {:class "flex-shrink-0"}
+         {:class "shrink-0"}
          [:img
           {:class "h-10 w-10 rounded-full",
            :src
@@ -197,7 +197,7 @@
         [:button
          {:type "button",
           :class
-          "relative ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"}
+          "relative ml-auto shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"}
          [:span {:class "absolute -inset-1.5"}]
          [:span {:class "sr-only"} "View notifications"]
          [:svg
