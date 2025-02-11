@@ -205,6 +205,8 @@
  ::conflicts
  :-> ::conflicts)
 
+
+;; Reminder about rfe/pathing
 #_(defn home []
     [:div
      [:h2 "Welcome to frontend"]

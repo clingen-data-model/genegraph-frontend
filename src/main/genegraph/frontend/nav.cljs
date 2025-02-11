@@ -1,12 +1,66 @@
 (ns genegraph.frontend.nav
   (:require [re-frame.core :as re-frame]
+            [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.user :as user]))
 
+;; TODO query submissions
+
+(def graphql-query
+  "
+query ($filters: [Filter]) {
+  find(filters: $filters) {
+    __typename
+    iri
+    label
+    ... on EvidenceStrengthAssertion {
+      subject {
+         __typename
+        ... on VariantPathogenicityProposition {
+          variant {
+            label
+          }
+        }
+      }
+    }
+  }
+}
+"
+  )
+
+(re-frame/reg-event-db
+ ::recieve-query-result
+ (fn [db [_ result]]
+   (js/console.log "recieved query")
+   (assoc db :query-data (get-in result [:response :data :find]))))
+
+(re-frame/reg-event-fx
+ ::execute-query
+ (fn [{:keys [db]} [_ query]]
+   (js/console.log "running query")
+   {:db (assoc db
+               ::current-query query
+               ::current-mode :view-data)
+    :fx [[:dispatch
+          [::re-graph/query
+           {:id ::query
+            :query graphql-query
+            :variables {:filters (:filters query)}
+            :callback [::recieve-query-result]}]]]}))
 
 (def queries
-  [{:label "All Gene Validity Assertions"}
-   {:label "All Variant Pathogenicity Assertions"}])
+  [{:label "All Gene Validity Assertions"
+    :description "I'm baby thundercats jawn chia pinterest tumblr lumbersexual blog flannel. Kinfolk food truck activated charcoal echo park cornhole umami brunch. Glossier photo booth williamsburg flexitarian four dollar toast fingerstache prism portland hammock gatekeep woke. You probably haven't heard of them cold-pressed live-edge schlitz ennui viral. Sartorial cronut schlitz literally chicharrones biodiesel tote bag activated charcoal. Tbh ugh ethical iceland meh typewriter mlkshk retro big mood."
+    :filters [{:filter :proposition_type
+               :argument "CG:GeneValidityProposition"}
+              {:filter :resource_type
+               :argument "CG:EvidenceStrengthAssertion"}]}
+   {:label "All Variant Pathogenicity Assertions"
+    :description "Solarpunk tilde vibecession knausgaard adaptogen ethical marxism affogato. Ramps quinoa deep v glossier sus heirloom health goth kickstarter tofu. Squid bruh +1 pickled tumblr kitsch vibecession kickstarter same viral cardigan cupping kombucha. Tbh YOLO Brooklyn taxidermy letterpress master cleanse cloud bread gatekeep tousled kickstarter. Truffaut meh tacos ugh DSA. Authentic blue bottle affogato echo park air plant heirloom selvage gatekeep art party meggings trust fund vexillologist. Seitan jean shorts scenester, shaman street art leggings tofu same vaporware."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :resource_type
+               :argument "CG:EvidenceStrengthAssertion"}]}])
 
 (def filters
   {:proposition_type {:label "Proposition Type"
@@ -20,13 +74,26 @@
                    :argument-list [{:label "Evidence Strength Assertion"
                                     :value "CG:EvidenceStrengthAssertion"}]}})
 
+(re-frame/reg-event-db
+ ::set-current-query
+ (fn [db [_ query]]
+   (assoc db
+          ::current-query query
+          ::current-mode :view-data)))
+
+(re-frame/reg-event-db
+ ::set-mode
+ (fn [db [_ mode]]
+   (js/console.log "Setting mode " (str mode))
+   (assoc db ::current-mode mode)))
+
 (re-frame/reg-sub
  ::current-query
  :-> ::current-query)
 
 (re-frame/reg-sub
  ::current-mode
- :-> :current-mode)
+ :-> ::current-mode)
 
 (defn nav-link [name text current-route]
   [:a
@@ -43,280 +110,55 @@
     "inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"}
    (:label query)])
 
-(defn query-display []
-  )
+(def link-arrow
+  [:svg
+   {:class "size-5 flex-none text-gray-400",
+    :viewBox "0 0 20 20",
+    :fill "currentColor",
+    :aria-hidden "true",
+    :data-slot "icon"}
+   [:path
+    {:fill-rule "evenodd",
+     :d
+     "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
+     :clip-rule "evenodd"}]])
 
 (defn query-select []
-  [:ul
- {:role "list", :class "divide-y divide-gray-100"}
- [:li
-  {:class "relative flex justify-between py-5"}
-  [:div
-   {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-   [:img
-    {:class "size-12 flex-none rounded-full bg-gray-50",
-     :src
-     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-     :alt ""}]
-   [:div
-    {:class "min-w-0 flex-auto"}
-    [:p
-     {:class "text-sm/6 font-semibold text-gray-900"}
-     [:a
-      {:href "#"}
-      [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-      "Leslie Alexander"]]
-    [:p
-     {:class "mt-1 flex text-xs/5 text-gray-500"}
-     [:a
-      {:href "mailto:leslie.alexander@example.com",
-       :class "relative truncate hover:underline"}
-      "leslie.alexander@example.com"]]]]
-  [:div
-   {:class
-    "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
-   [:div
-    {:class "hidden sm:block"}
-    [:p {:class "text-sm/6 text-gray-900"} "Co-Founder / CEO"]
-    [:p
-     {:class "mt-1 text-xs/5 text-gray-500"}
-     "Last seen"
-     [:time {:datetime "2023-01-23T13:23Z"} "3h ago"]]]
-   [:svg
-    {:class "size-5 flex-none text-gray-400",
-     :viewBox "0 0 20 20",
-     :fill "currentColor",
-     :aria-hidden "true",
-     :data-slot "icon"}
-    [:path
-     {:fill-rule "evenodd",
-      :d
-      "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
-      :clip-rule "evenodd"}]]]]
- [:li
-  {:class "relative flex justify-between py-5"}
-  [:div
-   {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-   [:img
-    {:class "size-12 flex-none rounded-full bg-gray-50",
-     :src
-     "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-     :alt ""}]
-   [:div
-    {:class "min-w-0 flex-auto"}
-    [:p
-     {:class "text-sm/6 font-semibold text-gray-900"}
-     [:a
-      {:href "#"}
-      [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-      "Michael Foster"]]
-    [:p
-     {:class "mt-1 flex text-xs/5 text-gray-500"}
-     [:a
-      {:href "mailto:michael.foster@example.com",
-       :class "relative truncate hover:underline"}
-      "michael.foster@example.com"]]]]
-  [:div
-   {:class
-    "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
-   [:div
-    {:class "hidden sm:block"}
-    [:p {:class "text-sm/6 text-gray-900"} "Co-Founder / CTO"]
-    [:p
-     {:class "mt-1 text-xs/5 text-gray-500"}
-     "Last seen"
-     [:time {:datetime "2023-01-23T13:23Z"} "3h ago"]]]
-   [:svg
-    {:class "size-5 flex-none text-gray-400",
-     :viewBox "0 0 20 20",
-     :fill "currentColor",
-     :aria-hidden "true",
-     :data-slot "icon"}
-    [:path
-     {:fill-rule "evenodd",
-      :d
-      "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
-      :clip-rule "evenodd"}]]]]
- [:li
-  {:class "relative flex justify-between py-5"}
-  [:div
-   {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-   [:img
-    {:class "size-12 flex-none rounded-full bg-gray-50",
-     :src
-     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-     :alt ""}]
-   [:div
-    {:class "min-w-0 flex-auto"}
-    [:p
-     {:class "text-sm/6 font-semibold text-gray-900"}
-     [:a
-      {:href "#"}
-      [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-      "Dries Vincent"]]
-    [:p
-     {:class "mt-1 flex text-xs/5 text-gray-500"}
-     [:a
-      {:href "mailto:dries.vincent@example.com",
-       :class "relative truncate hover:underline"}
-      "dries.vincent@example.com"]]]]
-  [:div
-   {:class
-    "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
-   [:div
-    {:class "hidden sm:block"}
-    [:p {:class "text-sm/6 text-gray-900"} "Business Relations"]
-    [:div
-     {:class "mt-1 flex items-center gap-x-1.5"}
-     [:div
-      {:class "flex-none rounded-full bg-emerald-500/20 p-1"}
-      [:div {:class "size-1.5 rounded-full bg-emerald-500"}]]
-     [:p {:class "text-xs/5 text-gray-500"} "Online"]]]
-   [:svg
-    {:class "size-5 flex-none text-gray-400",
-     :viewBox "0 0 20 20",
-     :fill "currentColor",
-     :aria-hidden "true",
-     :data-slot "icon"}
-    [:path
-     {:fill-rule "evenodd",
-      :d
-      "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
-      :clip-rule "evenodd"}]]]]
- [:li
-  {:class "relative flex justify-between py-5"}
-  [:div
-   {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-   [:img
-    {:class "size-12 flex-none rounded-full bg-gray-50",
-     :src
-     "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-     :alt ""}]
-   [:div
-    {:class "min-w-0 flex-auto"}
-    [:p
-     {:class "text-sm/6 font-semibold text-gray-900"}
-     [:a
-      {:href "#"}
-      [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-      "Lindsay Walton"]]
-    [:p
-     {:class "mt-1 flex text-xs/5 text-gray-500"}
-     [:a
-      {:href "mailto:lindsay.walton@example.com",
-       :class "relative truncate hover:underline"}
-      "lindsay.walton@example.com"]]]]
-  [:div
-   {:class
-    "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
-   [:div
-    {:class "hidden sm:block"}
-    [:p {:class "text-sm/6 text-gray-900"} "Front-end Developer"]
-    [:p
-     {:class "mt-1 text-xs/5 text-gray-500"}
-     "Last seen"
-     [:time {:datetime "2023-01-23T13:23Z"} "3h ago"]]]
-   [:svg
-    {:class "size-5 flex-none text-gray-400",
-     :viewBox "0 0 20 20",
-     :fill "currentColor",
-     :aria-hidden "true",
-     :data-slot "icon"}
-    [:path
-     {:fill-rule "evenodd",
-      :d
-      "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
-      :clip-rule "evenodd"}]]]]
- [:li
-  {:class "relative flex justify-between py-5"}
-  [:div
-   {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-   [:img
-    {:class "size-12 flex-none rounded-full bg-gray-50",
-     :src
-     "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-     :alt ""}]
-   [:div
-    {:class "min-w-0 flex-auto"}
-    [:p
-     {:class "text-sm/6 font-semibold text-gray-900"}
-     [:a
-      {:href "#"}
-      [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-      "Courtney Henry"]]
-    [:p
-     {:class "mt-1 flex text-xs/5 text-gray-500"}
-     [:a
-      {:href "mailto:courtney.henry@example.com",
-       :class "relative truncate hover:underline"}
-      "courtney.henry@example.com"]]]]
-  [:div
-   {:class
-    "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
-   [:div
-    {:class "hidden sm:block"}
-    [:p {:class "text-sm/6 text-gray-900"} "Designer"]
-    [:p
-     {:class "mt-1 text-xs/5 text-gray-500"}
-     "Last seen"
-     [:time {:datetime "2023-01-23T13:23Z"} "3h ago"]]]
-   [:svg
-    {:class "size-5 flex-none text-gray-400",
-     :viewBox "0 0 20 20",
-     :fill "currentColor",
-     :aria-hidden "true",
-     :data-slot "icon"}
-    [:path
-     {:fill-rule "evenodd",
-      :d
-      "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
-      :clip-rule "evenodd"}]]]]
- [:li
-  {:class "relative flex justify-between py-5"}
-  [:div
-   {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-   [:img
-    {:class "size-12 flex-none rounded-full bg-gray-50",
-     :src
-     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-     :alt ""}]
-   [:div
-    {:class "min-w-0 flex-auto"}
-    [:p
-     {:class "text-sm/6 font-semibold text-gray-900"}
-     [:a
-      {:href "#"}
-      [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-      "Tom Cook"]]
-    [:p
-     {:class "mt-1 flex text-xs/5 text-gray-500"}
-     [:a
-      {:href "mailto:tom.cook@example.com",
-       :class "relative truncate hover:underline"}
-      "tom.cook@example.com"]]]]
-  [:div
-   {:class
-    "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
-   [:div
-    {:class "hidden sm:block"}
-    [:p {:class "text-sm/6 text-gray-900"} "Director of Product"]
-    [:div
-     {:class "mt-1 flex items-center gap-x-1.5"}
-     [:div
-      {:class "flex-none rounded-full bg-emerald-500/20 p-1"}
-      [:div {:class "size-1.5 rounded-full bg-emerald-500"}]]
-     [:p {:class "text-xs/5 text-gray-500"} "Online"]]]
-   [:svg
-    {:class "size-5 flex-none text-gray-400",
-     :viewBox "0 0 20 20",
-     :fill "currentColor",
-     :aria-hidden "true",
-     :data-slot "icon"}
-    [:path
-     {:fill-rule "evenodd",
-      :d
-      "M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z",
-      :clip-rule "evenodd"}]]]]])
+  (for [query queries]
+    ^{:key query}
+    [:ul
+     {:role "list", :class "divide-y divide-gray-100"}
+     [:li
+      {:class "relative flex justify-between py-5"
+       :on-click #(re-frame/dispatch [::execute-query query])}
+      [:div
+       {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
+       #_[:img
+        {:class "size-12 flex-none rounded-full bg-gray-50",
+         :src
+         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+         :alt ""}]
+       [:div
+        {:class "min-w-0 flex-auto"}
+        [:p
+         {:class "text-sm/6 font-semibold text-gray-900"}
+         [:a
+          {:href "#"}
+          [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
+          (:label query)]]
+        #_[:p
+         {:class "mt-1 flex text-xs/5 text-gray-500"}
+         [:a
+          {:href "mailto:leslie.alexander@example.com",
+           :class "relative truncate hover:underline"}
+          "leslie.alexander@example.com"]]]]
+      [:div
+       {:class
+        "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
+       [:p
+        {:class "text-sm/5"}
+        (:description query)]
+       link-arrow]]]))
 
 (defn query-edit []
   )
@@ -503,31 +345,42 @@
        "block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"}
       "Sign out"]]]])
 
+(defn query-display []
+  (let [current-query @(re-frame/subscribe [::current-query])]
+    [:div
+     {:class "flex h-16 justify-between"}
+     [:div
+      {:class "flex"}
+      [:div
+       {:class "flex shrink-0 items-center"}
+       [:img
+        {:class "h-8 w-auto",
+         :src "/img/clingen-logo.svg"
+         :alt "ClinGen"}]]
+      [:div
+       {:class "hidden sm:ml-6 sm:flex sm:space-x-8"
+        :on-click #(re-frame/dispatch [::set-mode :select-query])}
+       (query-label current-query)
+       #_(nav-link :routes/home "Conflicts" current-route)
+       #_(nav-link :routes/annotations "Annotations" current-route)]]
+     (user)
+     (mobile-menu-button)]))
+
 (defn nav []
   (let [current-query @(re-frame/subscribe [::current-query])
         current-mode @(re-frame/subscribe [::current-mode])
         current-route @(re-frame/subscribe
                         [:genegraph.frontend.routes/current-route])]
-    [:nav
-     {:class "bg-white shadow-sm"}
-     [:div
-      {:class "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"}
+    [:div
+     [:nav
+      {:class "bg-white shadow-sm"}
       [:div
-       {:class "flex h-16 justify-between"}
-       [:div
-        {:class "flex"}
-        [:div
-         {:class "flex shrink-0 items-center"}
-         [:img
-          {:class "h-8 w-auto",
-           :src "/img/clingen-logo.svg"
-           :alt "ClinGen"}]]
-        [:div
-         {:class "hidden sm:ml-6 sm:flex sm:space-x-8"}
-         (nav-link :routes/home "Conflicts" current-route)
-         (nav-link :routes/annotations "Annotations" current-route)]]
-       (user)
-       (mobile-menu-button)]]
-     (mobile-menu)]))
+       {:class "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"}
+       (query-display)]
+      (mobile-menu)]
+     (if (or (not current-query)
+             (= :select-query current-mode))
+       (query-select)
+       [:div])]))
 
 
