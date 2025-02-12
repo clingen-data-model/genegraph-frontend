@@ -7,17 +7,34 @@
 ;; TODO query submissions
 
 (def graphql-query
-  "
+"
 query ($filters: [Filter]) {
   find(filters: $filters) {
     __typename
     iri
     label
     ... on EvidenceStrengthAssertion {
+      classification {
+        label
+      }
+      contributions {
+        agent {
+          iri
+          label
+        }
+        role {
+          iri
+          label
+        }
+        date
+      }
       subject {
-         __typename
+        __typename
+        iri
         ... on VariantPathogenicityProposition {
+          curie
           variant {
+            iri
             label
           }
         }
@@ -25,6 +42,7 @@ query ($filters: [Filter]) {
     }
   }
 }
+
 "
   )
 
@@ -133,11 +151,6 @@ query ($filters: [Filter]) {
        :on-click #(re-frame/dispatch [::execute-query query])}
       [:div
        {:class "flex gap-x-4 pr-6 sm:w-1/2 sm:flex-none"}
-       #_[:img
-        {:class "size-12 flex-none rounded-full bg-gray-50",
-         :src
-         "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-         :alt ""}]
        [:div
         {:class "min-w-0 flex-auto"}
         [:p
@@ -145,13 +158,7 @@ query ($filters: [Filter]) {
          [:a
           {:href "#"}
           [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
-          (:label query)]]
-        #_[:p
-         {:class "mt-1 flex text-xs/5 text-gray-500"}
-         [:a
-          {:href "mailto:leslie.alexander@example.com",
-           :class "relative truncate hover:underline"}
-          "leslie.alexander@example.com"]]]]
+          (:label query)]]]]
       [:div
        {:class
         "flex items-center justify-between gap-x-4 sm:w-1/2 sm:flex-none"}
@@ -187,37 +194,7 @@ query ($filters: [Filter]) {
        :aria-haspopup "true"}
       [:span {:class "absolute -inset-1.5"}]
       [:span {:class "sr-only"} "Open user menu"]]]
-    (comment
-      "Dropdown menu, show/hide based on menu state.\n\n            Entering: \"transition ease-out duration-200\"\n              From: \"transform opacity-0 scale-95\"\n              To: \"transform opacity-100 scale-100\"\n            Leaving: \"transition ease-in duration-75\"\n              From: \"transform opacity-100 scale-100\"\n              To: \"transform opacity-0 scale-95\"")
-    #_[:div
-       {:class
-        "absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden",
-        :role "menu",
-        :aria-orientation "vertical",
-        :aria-labelledby "user-menu-button",
-        :tabIndex "-1"}
-       (comment "Active: \"bg-gray-100\", Not Active: \"\"")
-       [:a
-        {:href "#",
-         :class "block px-4 py-2 text-sm text-gray-700",
-         :role "menuitem",
-         :tabIndex "-1",
-         :id "user-menu-item-0"}
-        "Your Profile"]
-       [:a
-        {:href "#",
-         :class "block px-4 py-2 text-sm text-gray-700",
-         :role "menuitem",
-         :tabIndex "-1",
-         :id "user-menu-item-1"}
-        "Settings"]
-       [:a
-        {:href "#",
-         :class "block px-4 py-2 text-sm text-gray-700",
-         :role "menuitem",
-         :tabIndex "-1",
-         :id "user-menu-item-2"}
-        "Sign out"]]]])
+]])
 
 (defn mobile-menu-button []
   [:div

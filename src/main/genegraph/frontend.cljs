@@ -9,7 +9,9 @@
             [re-frame.core :as re-frame]
             [re-graph.core :as re-graph]
             [genegraph.frontend.routes :as routes]
-            [genegraph.frontend.page.conflict-list :as conflict-list]))
+            [genegraph.frontend.page.conflict-list :as conflict-list]
+            [genegraph.frontend.display.variant]
+            [genegraph.frontend.display.assertion]))
 
 (enable-console-print!)
 
@@ -77,7 +79,7 @@
 (defn ^:dev/after-load render-root []
   (println "[main] reloaded lib:")
   (routes/init-routes!)  
-  (.render root (r/as-element [routes/router-component
+  (.render root (reagent/as-element [routes/router-component
                                {:router routes/router}])))
 
 (defn ^:export init []
