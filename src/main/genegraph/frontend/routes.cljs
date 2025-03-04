@@ -75,7 +75,7 @@
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
                 (js/console.log "Entering home page")
-                (re-frame/dispatch [::home/request-conflict-list]))
+                #_(re-frame/dispatch [::home/request-conflict-list]))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving home page"))}]}]

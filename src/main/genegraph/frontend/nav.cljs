@@ -6,7 +6,7 @@
 
 ;; TODO query submissions
 
-(def graphql-query
+#_(def graphql-query
 "
 query ($filters: [Filter]) {
   find(filters: $filters) {
@@ -46,11 +46,48 @@ query ($filters: [Filter]) {
 "
   )
 
+(def graphql-query
+"
+query ($filters: [Filter]) {
+  assertions(filters: $filters) {
+    __typename
+    iri
+    label
+    classification {
+      label
+    }
+    contributions {
+      agent {
+        iri
+        label
+      }
+      role {
+        iri
+        label
+      }
+      date
+    }
+    subject {
+      __typename
+      iri
+      ... on VariantPathogenicityProposition {
+        curie
+        variant {
+          iri
+          label
+        }
+      }
+    }
+  }
+}
+"
+  )
+
 (re-frame/reg-event-db
  ::recieve-query-result
  (fn [db [_ result]]
    (js/console.log "recieved query")
-   (assoc db :query-data (get-in result [:response :data :find]))))
+   (assoc db :query-data (get-in result [:response :data :assertions]))))
 
 (re-frame/reg-event-fx
  ::execute-query
@@ -66,19 +103,164 @@ query ($filters: [Filter]) {
             :variables {:filters (:filters query)}
             :callback [::recieve-query-result]}]]]}))
 
-(def queries
+#_(def queries
   [{:label "All Gene Validity Assertions"
-    :description "I'm baby thundercats jawn chia pinterest tumblr lumbersexual blog flannel. Kinfolk food truck activated charcoal echo park cornhole umami brunch. Glossier photo booth williamsburg flexitarian four dollar toast fingerstache prism portland hammock gatekeep woke. You probably haven't heard of them cold-pressed live-edge schlitz ennui viral. Sartorial cronut schlitz literally chicharrones biodiesel tote bag activated charcoal. Tbh ugh ethical iceland meh typewriter mlkshk retro big mood."
+    :description "Yo, vibe check! Flexin’ on the timeline, no cap. Drip too hard, lowkey sus but still bussin’. Big mood, finna glow up, stay woke, bet."
     :filters [{:filter :proposition_type
                :argument "CG:GeneValidityProposition"}
               {:filter :resource_type
                :argument "CG:EvidenceStrengthAssertion"}]}
    {:label "All Variant Pathogenicity Assertions"
-    :description "Solarpunk tilde vibecession knausgaard adaptogen ethical marxism affogato. Ramps quinoa deep v glossier sus heirloom health goth kickstarter tofu. Squid bruh +1 pickled tumblr kitsch vibecession kickstarter same viral cardigan cupping kombucha. Tbh YOLO Brooklyn taxidermy letterpress master cleanse cloud bread gatekeep tousled kickstarter. Truffaut meh tacos ugh DSA. Authentic blue bottle affogato echo park air plant heirloom selvage gatekeep art party meggings trust fund vexillologist. Seitan jean shorts scenester, shaman street art leggings tofu same vaporware."
+    :description "Slay the fit, fam! No cap, this vibe hits different. Lowkey savage, highkey flex, straight fire. Big yikes, but still unbothered. Glow up pending, bet."
     :filters [{:filter :proposition_type
                :argument "CG:VariantPathogenicityProposition"}
               {:filter :resource_type
                :argument "CG:EvidenceStrengthAssertion"}]}])
+
+;; copy number gain EFO:0030070
+;; copy number loss EFO:0030067
+
+(def queries
+  [{:label "Deletions with >= 35 Genes"
+    :description "Copy Number Loss variants in ClinVar that meet the criteria for Likely Pathogenic according to the ACMG guidelines based on gene count alone."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"}]}
+   {:label "Duplications with >= 50 Genes"
+    :description "Copy Number Loss variants in ClinVar that meet the criteria for Likely Pathogenic according to the ACMG guidelines based on gene count alone."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030070"}
+              {:filter :gene_count_min
+               :argument "CG:Genes50"}]}
+   {:label "Deletions with complete overlap of HI 3 features"
+    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Haploinsufficient with convincing evidence by the ClinGen Dosage Map."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"}]}
+   {:label "Duplications with complete overlap of TS 3 features"
+    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Haploinsufficient with convincing evidence by the ClinGen Dosage Map."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030070"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:TriplosensitivityFeatures"}]}
+   {:label "Deletions with complete overlap of AD/XL gene-disease-validity"
+    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Moderate or greater in the ClinGen Gene-Disease Validity curation framework that is associated with an Autosomal Dominant or X-Linked inheritance pattern."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"}]}
+   {:label "Deletions with complete overlap with AR genes not AD genes"
+    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Moderate or greater in the ClinGen Gene-Disease Validity curation framework that is associated with an Autosomal Recessive inheritance pattern or a gene classified as having an Autosomal Recessive pattern in Gene Dosage (Score 30), excluding variants that overlap a gene associated with an Autosomal Dominant condition."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:ARGene"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"
+               :operation "not_exists"}]}
+   {:label "Deletions with partial overlap of HI genes"
+    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as Haploinsufficenty genes in the ClinGen Dosage map. Excluding variants that could be counted as pathogenic for another reason."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"
+               :operation "not_exists"}]}
+   {:label "Deletions with partial overlap of AD/XL Gene Validity features"
+    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as having Moderate or greater evidence and AD/XL inheritance pattern in the ClinGen Gene Validity framework; Excluding variants that could be counted as pathogenic for another reason."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"
+               :operation "not_exists"}]}
+   {:label "Deletions with partial overlap of autosomal recessive genes"
+    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as Haploinsufficenty genes in the ClinGen Dosage map. Excluding variants that could be counted as pathogenic for another reason."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:ARGene"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"
+               :operation "not_exists"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"
+               :operation "not_exists"}]}
+   {:label "Variants with no ClinGen data available"
+    :description "Copy Number Loss variants in ClinVar that no overlap with features in ClinGen knowledgebases."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:ARGene"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:ARGene"
+               :operation "not_exists"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:GeneValidityModerateAndGreaterADXL"
+               :operation "not_exists"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"
+               :operation "not_exists"}]}
+   
+   ])
 
 (def filters
   {:proposition_type {:label "Proposition Type"
