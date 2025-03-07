@@ -39,13 +39,13 @@
     [:p
      {:class "text-sm leading-6 text-gray-500"}
      (get-in assertion [:classification :label])]]
-   (if-let [eval (evaluation assertion)]
+   (if-let [e (evaluation assertion)]
      [:div
       {:class "flex flex-col items-end text-sm text-gray-500"}
       [:p
-       (get-in eval [:agent :label])]
+       (get-in e [:agent :label])]
       [:p
-       (:date eval)]]
+       (:date e)]]
      [:div "donkey"])])
 
 (defmethod display/list-title  "VariantPathogenicityProposition"

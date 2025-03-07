@@ -2,86 +2,8 @@
   (:require [re-frame.core :as re-frame]
             [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]
-            [genegraph.frontend.user :as user]))
-
-;; TODO query submissions
-
-#_(def graphql-query
-"
-query ($filters: [Filter]) {
-  find(filters: $filters) {
-    __typename
-    iri
-    label
-    ... on EvidenceStrengthAssertion {
-      classification {
-        label
-      }
-      contributions {
-        agent {
-          iri
-          label
-        }
-        role {
-          iri
-          label
-        }
-        date
-      }
-      subject {
-        __typename
-        iri
-        ... on VariantPathogenicityProposition {
-          curie
-          variant {
-            iri
-            label
-          }
-        }
-      }
-    }
-  }
-}
-
-"
-  )
-
-(def graphql-query
-"
-query ($filters: [Filter]) {
-  assertions(filters: $filters) {
-    __typename
-    iri
-    label
-    classification {
-      label
-    }
-    contributions {
-      agent {
-        iri
-        label
-      }
-      role {
-        iri
-        label
-      }
-      date
-    }
-    subject {
-      __typename
-      iri
-      ... on VariantPathogenicityProposition {
-        curie
-        variant {
-          iri
-          label
-        }
-      }
-    }
-  }
-}
-"
-  )
+            [genegraph.frontend.user :as user]
+            [genegraph.frontend.queries :as queries]))
 
 (re-frame/reg-event-db
  ::recieve-query-result
@@ -99,180 +21,12 @@ query ($filters: [Filter]) {
     :fx [[:dispatch
           [::re-graph/query
            {:id ::query
-            :query graphql-query
+            :query queries/graphql-query
             :variables {:filters (:filters query)}
             :callback [::recieve-query-result]}]]]}))
 
-#_(def queries
-  [{:label "All Gene Validity Assertions"
-    :description "Yo, vibe check! Flexin’ on the timeline, no cap. Drip too hard, lowkey sus but still bussin’. Big mood, finna glow up, stay woke, bet."
-    :filters [{:filter :proposition_type
-               :argument "CG:GeneValidityProposition"}
-              {:filter :resource_type
-               :argument "CG:EvidenceStrengthAssertion"}]}
-   {:label "All Variant Pathogenicity Assertions"
-    :description "Slay the fit, fam! No cap, this vibe hits different. Lowkey savage, highkey flex, straight fire. Big yikes, but still unbothered. Glow up pending, bet."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :resource_type
-               :argument "CG:EvidenceStrengthAssertion"}]}])
-
 ;; copy number gain EFO:0030070
 ;; copy number loss EFO:0030067
-
-(def queries
-  [{:label "Deletions with >= 35 Genes"
-    :description "Copy Number Loss variants in ClinVar that meet the criteria for Likely Pathogenic according to the ACMG guidelines based on gene count alone."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :gene_count_min
-               :argument "CG:Genes35"}]}
-   {:label "Duplications with >= 50 Genes"
-    :description "Copy Number Loss variants in ClinVar that meet the criteria for Likely Pathogenic according to the ACMG guidelines based on gene count alone."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030070"}
-              {:filter :gene_count_min
-               :argument "CG:Genes50"}]}
-   {:label "Deletions with complete overlap of HI 3 features"
-    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Haploinsufficient with convincing evidence by the ClinGen Dosage Map."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"}]}
-   {:label "Duplications with complete overlap of TS 3 features"
-    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Haploinsufficient with convincing evidence by the ClinGen Dosage Map."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030070"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:TriplosensitivityFeatures"}]}
-   {:label "Deletions with complete overlap of AD/XL gene-disease-validity"
-    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Moderate or greater in the ClinGen Gene-Disease Validity curation framework that is associated with an Autosomal Dominant or X-Linked inheritance pattern."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"}]}
-   {:label "Deletions with complete overlap with AR genes not AD genes"
-    :description "Copy Number Loss variants in ClinVar that have a complete overlap with a gene classified as Moderate or greater in the ClinGen Gene-Disease Validity curation framework that is associated with an Autosomal Recessive inheritance pattern or a gene classified as having an Autosomal Recessive pattern in Gene Dosage (Score 30), excluding variants that overlap a gene associated with an Autosomal Dominant condition."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:ARGene"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :gene_count_min
-               :argument "CG:Genes35"
-               :operation "not_exists"}]}
-   {:label "Deletions with partial overlap of HI genes"
-    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as Haploinsufficenty genes in the ClinGen Dosage map. Excluding variants that could be counted as pathogenic for another reason."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :gene_count_min
-               :argument "CG:Genes35"
-               :operation "not_exists"}]}
-   {:label "Deletions with partial overlap of AD/XL Gene Validity features"
-    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as having Moderate or greater evidence and AD/XL inheritance pattern in the ClinGen Gene Validity framework; Excluding variants that could be counted as pathogenic for another reason."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :gene_count_min
-               :argument "CG:Genes35"
-               :operation "not_exists"}]}
-   {:label "Deletions with partial overlap of autosomal recessive genes"
-    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as Haploinsufficenty genes in the ClinGen Dosage map. Excluding variants that could be counted as pathogenic for another reason."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:ARGene"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"
-               :operation "not_exists"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :gene_count_min
-               :argument "CG:Genes35"
-               :operation "not_exists"}]}
-   {:label "Variants with no ClinGen data available"
-    :description "Copy Number Loss variants in ClinVar that no overlap with features in ClinGen knowledgebases."
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :copy_change
-               :argument "EFO:0030067"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:ARGene"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:ARGene"
-               :operation "not_exists"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:GeneValidityModerateAndGreaterADXL"
-               :operation "not_exists"}
-              {:filter :partial_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :complete_overlap_with_feature_set
-               :argument "CG:HaploinsufficiencyFeatures"
-               :operation "not_exists"}
-              {:filter :gene_count_min
-               :argument "CG:Genes35"
-               :operation "not_exists"}]}
-   
-   ])
-
-(def filters
-  {:proposition_type {:label "Proposition Type"
-                      :description "Use this to choose between Gene Validity, Variant Pathogenicity, or Condition Mechansim."
-                      :argument-list [{:label "Gene Validity"
-                                       :value "CG:GeneValidityProposition"}
-                                      {:label "Variant Pathogenicity"
-                                       :value "CG:VariantPathogenicityProposition"}]}
-   :resource_type {:label "Resource Type"
-                   :description "Evidence Strength Assertion, Variant, Gene, Disease,or Organization."
-                   :argument-list [{:label "Evidence Strength Assertion"
-                                    :value "CG:EvidenceStrengthAssertion"}]}})
 
 (re-frame/reg-event-db
  ::set-current-query
@@ -294,6 +48,15 @@ query ($filters: [Filter]) {
 (re-frame/reg-sub
  ::current-mode
  :-> ::current-mode)
+
+(re-frame/reg-event-db
+ ::set-show-user-menu
+ (fn [db [_ show-menu]]
+   (assoc db ::show-user-menu show-menu)))
+
+(re-frame/reg-sub
+ ::show-user-menu
+ :-> ::show-user-menu)
 
 (defn nav-link [name text current-route]
   [:a
@@ -324,7 +87,7 @@ query ($filters: [Filter]) {
      :clip-rule "evenodd"}]])
 
 (defn query-select []
-  (for [query queries]
+  (for [query queries/queries]
     ^{:key query}
     [:ul
      {:role "list", :class "divide-y divide-gray-100"}
@@ -529,17 +292,133 @@ query ($filters: [Filter]) {
   (let [current-query @(re-frame/subscribe [::current-query])
         current-mode @(re-frame/subscribe [::current-mode])
         current-route @(re-frame/subscribe
-                        [:genegraph.frontend.routes/current-route])]
+                        [:genegraph.frontend.routes/current-route])
+        show-user-menu @(re-frame/subscribe [::show-user-menu])]
     [:div
      [:nav
-      {:class "bg-white shadow-sm"}
+      {:class "bg-white shadow-sm flex"}
       [:div
-       {:class "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"}
+       {:class "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex jusftify-"}
        (query-display)]
+      [:div
+       {:class "flex justify-end"}
+       ]
       (mobile-menu)]
      (if (or (not current-query)
              (= :select-query current-mode))
        (query-select)
        [:div])]))
+
+(comment
+  [:header
+   {:class "bg-white"}
+   [:nav
+    {:class
+     "mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8",
+     :aria-label "Global"}
+    [:div
+     {:class "flex flex-1"}
+     [:div
+      {:class "hidden lg:flex lg:gap-x-12"}
+      [:a
+       {:href "#", :class "text-sm/6 font-semibold text-gray-900"}
+       "Product"]
+      [:a
+       {:href "#", :class "text-sm/6 font-semibold text-gray-900"}
+       "Features"]
+      [:a
+       {:href "#", :class "text-sm/6 font-semibold text-gray-900"}
+       "Company"]]
+     [:div
+      {:class "flex lg:hidden"}
+      [:button
+       {:type "button",
+        :class
+        "-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"}
+       [:span {:class "sr-only"} "Open main menu"]
+       [:svg
+        {:class "size-6",
+         :fill "none",
+         :viewBox "0 0 24 24",
+         :stroke-width "1.5",
+         :stroke "currentColor",
+         :aria-hidden "true",
+         :data-slot "icon"}
+        [:path
+         {:stroke-linecap "round",
+          :stroke-linejoin "round",
+          :d "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"}]]]]]
+    [:a
+     {:href "#", :class "-m-1.5 p-1.5"}
+     [:span {:class "sr-only"} "Your Company"]
+     [:img
+      {:class "h-8 w-auto",
+       :src
+       "https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600",
+       :alt ""}]]
+    [:div
+     {:class "flex flex-1 justify-end"}
+     [:a
+      {:href "#", :class "text-sm/6 font-semibold text-gray-900"}
+      "Log in"
+      [:span {:aria-hidden "true"} "→"]]]]
+   (comment "Mobile menu, show/hide based on menu open state.")
+   [:div
+    {:class "lg:hidden", :role "dialog", :aria-modal "true"}
+    (comment "Background backdrop, show/hide based on slide-over state.")
+    [:div {:class "fixed inset-0 z-10"}]
+    [:div
+     {:class
+      "fixed inset-y-0 left-0 z-10 w-full overflow-y-auto bg-white px-6 py-6"}
+     [:div
+      {:class "flex items-center justify-between"}
+      [:div
+       {:class "flex flex-1"}
+       [:button
+        {:type "button", :class "-m-2.5 rounded-md p-2.5 text-gray-700"}
+        [:span {:class "sr-only"} "Close menu"]
+        [:svg
+         {:class "size-6",
+          :fill "none",
+          :viewBox "0 0 24 24",
+          :stroke-width "1.5",
+          :stroke "currentColor",
+          :aria-hidden "true",
+          :data-slot "icon"}
+         [:path
+          {:stroke-linecap "round",
+           :stroke-linejoin "round",
+           :d "M6 18 18 6M6 6l12 12"}]]]]
+      [:a
+       {:href "#", :class "-m-1.5 p-1.5"}
+       [:span {:class "sr-only"} "Your Company"]
+       [:img
+        {:class "h-8 w-auto",
+         :src
+         "https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600",
+         :alt ""}]]
+      [:div
+       {:class "flex flex-1 justify-end"}
+       [:a
+        {:href "#", :class "text-sm/6 font-semibold text-gray-900"}
+        "Log in"
+        [:span {:aria-hidden "true"} "→"]]]]
+     [:div
+      {:class "mt-6 space-y-2"}
+      [:a
+       {:href "#",
+        :class
+        "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"}
+       "Product"]
+      [:a
+       {:href "#",
+        :class
+        "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"}
+       "Features"]
+      [:pa
+       {:href "#",
+        :class
+        "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"}
+       "Company"]]]]])
 
 
