@@ -7,6 +7,11 @@ query ($filters: [Filter]) {
     __typename
     iri
     label
+    annotations {
+      classification {
+        iri
+       }
+    }
     classification {
       label
     }
@@ -175,4 +180,15 @@ query ($filters: [Filter]) {
                :operation "not_exists"}
               {:filter :gene_count_min
                :argument "CG:Genes35"
-               :operation "not_exists"}]}])
+               :operation "not_exists"}]}
+   {:label "Annotated assertions"
+    :description "Assertions that have been annotated by curators."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :has_annotation}]}
+   {:label "Other annotated assertions"
+    :description "Assertions that have been annotated by curators, without making an assessment about the quality of the submission or the "
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :has_annotation
+               :argument "CG:NoAssessment"}]}])
