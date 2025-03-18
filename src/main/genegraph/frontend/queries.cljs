@@ -9,11 +9,11 @@ query ($filters: [Filter]) {
     label
     annotations {
       classification {
-        iri
+        curie
        }
     }
     classification {
-      label
+      curie
     }
     contributions {
       agent {
