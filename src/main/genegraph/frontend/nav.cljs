@@ -144,18 +144,28 @@
     :select-user (select-user)
     [:div]))
 
-(defn nav []
-  [:header
-   {:class "bg-white p-6 px-8"}
-   [:nav
-    {:class
-     "mx-auto flex max-w-7xl items-center justify-between ",
-     :aria-label "Global"}
-    clingen-logo
-    (query-label)
-    (user-nav)]
-   [:div
+(re-frame/reg-event-db
+ ::nav-state
+ (fn [db [_ state]]
+   (assoc db ::nav-state state)))
 
-    (nav-menu)]])
+(re-frame/reg-sub
+ ::nav-state
+ :-> ::nav-state)
+
+(defn nav []
+  (if-not (= :hidden @(re-frame/subscribe [::nav-state]))
+    [:header
+     {:class "bg-white p-6 px-8"}
+     [:nav
+      {:class
+       "mx-auto flex max-w-7xl items-center justify-between ",
+       :aria-label "Global"}
+      clingen-logo
+      (query-label)
+      (user-nav)]
+     [:div
+      (nav-menu)]]
+    [:div]))
 
 

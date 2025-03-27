@@ -6,6 +6,8 @@
             [re-frame.core :as re-frame]
             [genegraph.frontend.nav :as nav]
             [genegraph.frontend.page.home :as home]
+            [genegraph.frontend.page.gencc-home :as gencc-home]
+            [genegraph.frontend.page.gencc-list :as gencc-list]
             [genegraph.frontend.page.annotations :as annotations]
             [genegraph.frontend.page.conflict-list :as conflict-list]))
 
@@ -74,17 +76,47 @@
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
+                (re-frame/dispatch [::nav/nav-state nil])
                 (js/console.log "Entering home page")
                 #_(re-frame/dispatch [::home/request-conflict-list]))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving home page"))}]}]
+   ["gencc-home"
+    {:name      :routes/gencc-home
+     :view      gencc-home/home
+     :link-text "GenCC"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (re-frame/dispatch [::nav/nav-state :hidden])
+                (js/console.log "Entering gencc page")
+                #_(re-frame/dispatch [::home/request-conflict-list]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving gencc page"))}]}]
+   ["gencc-list"
+    {:name      :routes/gencc-list
+     :view      gencc-list/home
+     :link-text "GenCC Genes"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (re-frame/dispatch [::nav/nav-state :hidden])
+                (re-frame/dispatch [::gencc-list/fetch-list])
+                (js/console.log "Entering gencc list page")
+                #_(re-frame/dispatch [::home/request-conflict-list]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving gencc page"))}]}]
    ["annotations"
     {:name      :routes/annotations
      :view      annotations/annotations
      :link-text "Annotations"
      :controllers
-     [{;; Do whatever initialization needed for home page
+     [{ ;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
                 (js/console.log "Entering annotations page")
@@ -135,7 +167,7 @@
 #_"min-h-full mx-auto max-w-7xl sm:px-6 lg:px-8"
 (defn router-component [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::current-route])]
-    [:div {:class "container sm:px-6 lg:px-8"}
+    [:div {:class "container"}
      [nav/nav]
      (when current-route
        [(-> current-route :data :view)])]))
