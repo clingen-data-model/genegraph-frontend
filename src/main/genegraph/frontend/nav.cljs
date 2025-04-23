@@ -3,7 +3,8 @@
             [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.user :as user]
-            [genegraph.frontend.queries :as queries]))
+            [genegraph.frontend.queries :as queries]
+            [genegraph.frontend.icon :as icon]))
 
 (re-frame/reg-event-db
  ::recieve-query-result
@@ -101,15 +102,18 @@
 
 (def clingen-logo
   [:div
-   {:class "flex flex-1 items-center"}
+   {:class "flex items-center"}
    [:img
     {:class "h-8 w-auto",
      :src "/img/clingen-logo.svg"
      :alt "ClinGen"}]])
 
+
+
+
 (defn query-label []
   [:div
-   {:class "flex text-sm font-medium text-gray-900 hover:text-gray-500"
+   {:class "flex flex-1 justify-end text-sm font-medium text-gray-900 hover:text-gray-500"
     :on-click #(re-frame/dispatch [::set-mode :select-query])}
    (if-let [label (:label @(re-frame/subscribe [::current-query]))]
      label
@@ -153,6 +157,56 @@
  ::nav-state
  :-> ::nav-state)
 
+#_(defn search-div []
+  [:div
+   {:class "flex flex-1 ml-6"}
+   icon/magnifying-glass])
+
+[:div
+ [:label
+  {:for "email", :class "block text-sm/6 font-medium text-gray-900"}
+  "Email"]
+ [:div
+  {:class "mt-2 grid grid-cols-1"}
+  [:input
+   {:type "email",
+    :name "email",
+    :id "email",
+    :class
+    "col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6",
+    :placeholder "you@example.com"}]
+  [:svg
+   {:class
+    "pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-4",
+    :viewBox "0 0 16 16",
+    :fill "currentColor",
+    :aria-hidden "true",
+    :data-slot "icon"}
+   [:path
+    {:d
+     "M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z"}]
+   [:path
+    {:d
+     "M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z"}]]]]
+(defn search-div []
+  [:div
+   {:class "mt-2 grid grid-cols-1"}
+   [:input
+    {:type "email",
+     :name "email",
+     :id "email",
+     :class
+     "col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6",
+     :placeholder "gene symbol"}]
+   [:div
+    {:class
+     "pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-4",
+     :viewBox "0 0 16 16",
+     :fill "currentColor",
+     :aria-hidden "true",
+     :data-slot "icon"}
+    icon/magnifying-glass]])
+
 (defn nav []
   (if-not (= :hidden @(re-frame/subscribe [::nav-state]))
     [:header
@@ -162,6 +216,7 @@
        "mx-auto flex max-w-7xl items-center justify-between ",
        :aria-label "Global"}
       clingen-logo
+      (search-div)
       (query-label)
       (user-nav)]
      [:div
