@@ -9,7 +9,9 @@
             [genegraph.frontend.page.gencc-home :as gencc-home]
             [genegraph.frontend.page.gencc-list :as gencc-list]
             [genegraph.frontend.page.annotations :as annotations]
-            [genegraph.frontend.page.conflict-list :as conflict-list]))
+            [genegraph.frontend.page.conflict-list :as conflict-list]
+            [genegraph.frontend.components.search :as search]
+            [genegraph.frontend.components.resource :as resource]))
 
 ;;; Effects ;;;
 
@@ -165,9 +167,18 @@
       [:a {:href (href route-name)} text]])])
 
 #_"min-h-full mx-auto max-w-7xl sm:px-6 lg:px-8"
-(defn router-component [{:keys [router]}]
+#_(defn router-component [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::current-route])]
     [:div {:class "container"}
-     [nav/nav]
+     #_[nav/nav]
      (when current-route
        [(-> current-route :data :view)])]))
+
+(defn router-component [{:keys [router]}]
+  (let [current-route @(re-frame/subscribe [::current-route])]
+    [:div
+     {:class "container"}
+     [:div
+      {:class "mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8 flex"}
+      (search/search-div)
+      (resource/resource-div)]]))
