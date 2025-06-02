@@ -35,10 +35,10 @@
                      "main.js")))
 
 (defn build-assets []
-  #_(shell "yarn release")
   (shell (str "yarn shadow-cljs release app --config-merge '{:release-version "
               current-version
-              "}'")))
+              "}'"))
+  (shell "yarn cross-env NODE_ENV=production postcss src/css/tailwind.css -o ./public/css/main.css --verbose"))
 
 
 
