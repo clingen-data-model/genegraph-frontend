@@ -1,7 +1,11 @@
-(ns genegraph.frontend.queries)
+(ns genegraph.frontend.queries
+  (:require [re-frame.core :as re-frame]
+            [re-graph.core :as re-graph]))
+
+
 
 (def graphql-query
-"
+  "
 query ($filters: [Filter]) {
   assertions(filters: $filters) {
     __typename
@@ -41,6 +45,32 @@ query ($filters: [Filter]) {
 }
 "
   )
+
+(re-frame/reg-event-fx
+ ::send-query
+ (fn [{:keys [db]} [_ filters]]
+   (js/console.log "sending query")
+   {:fx [[:dispatch
+          [::re-graph/query
+           {:id ::query
+            :query graphql-query
+            :variables {:filters filters}
+            :callback [::recieve-query-result]}]]]}))
+
+(re-frame/reg-event-db
+ ::recieve-query-result
+ (fn [db [_ result]]
+   (js/console.log "recieved result")
+   (assoc db
+          ::query-result
+          (get-in result
+                  [:response
+                   :data
+                   :assertions]))))
+
+(re-frame/reg-sub
+ ::query-result
+ :-> ::query-result)
 
 (def queries
   [{:label "Deletions with >= 35 Genes"
@@ -186,9 +216,9 @@ query ($filters: [Filter]) {
     :filters [{:filter :proposition_type
                :argument "CG:VariantPathogenicityProposition"}
               {:filter :has_annotation}]}
-   {:label "Other annotated assertions"
-    :description "Assertions that have been annotated by curators, without making an assessment about the quality of the submission or the "
-    :filters [{:filter :proposition_type
-               :argument "CG:VariantPathogenicityProposition"}
-              {:filter :has_annotation
-               :argument "CG:NoAssessment"}]}])
+   #_{:label "Other annotated assertions"
+      :description "Assertions that have been annotated by curators, without making an assessment about the quality of the submission or the "
+      :filters [{:filter :proposition_type
+                 :argument "CG:VariantPathogenicityProposition"}
+                {:filter :has_annotation
+                 :argument "CG:NoAssessment"}]}])

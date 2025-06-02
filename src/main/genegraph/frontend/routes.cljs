@@ -10,6 +10,7 @@
             [genegraph.frontend.page.gencc-list :as gencc-list]
             [genegraph.frontend.page.annotations :as annotations]
             [genegraph.frontend.page.conflict-list :as conflict-list]
+            [genegraph.frontend.view :as view]
             [genegraph.frontend.components.search :as search]
             [genegraph.frontend.components.resource :as resource]))
 
@@ -176,9 +177,4 @@
 
 (defn router-component [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::current-route])]
-    [:div
-     {:class "container"}
-     [:div
-      {:class "mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8 flex"}
-      (search/search-div)
-      (resource/resource-div)]]))
+    (view/app-div)))

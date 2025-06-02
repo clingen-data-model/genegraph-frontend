@@ -5,6 +5,7 @@
             [genegraph.frontend.icon :as icon]
             [clojure.set :as set]))
 
+
 (defn feature-with-assertion-type [feature typename strength-values]
   (let [strength-set (set strength-values)]
     (some

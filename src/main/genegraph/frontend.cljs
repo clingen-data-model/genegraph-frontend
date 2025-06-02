@@ -11,7 +11,8 @@
             [genegraph.frontend.routes :as routes]
             [genegraph.frontend.page.conflict-list :as conflict-list]
             [genegraph.frontend.display.variant]
-            [genegraph.frontend.display.assertion]))
+            [genegraph.frontend.display.assertion]
+            [genegraph.frontend.view :as view]))
 
 (enable-console-print!)
 
@@ -89,4 +90,5 @@
                        :http {:url BACKEND_HTTP
                               :impl {:headers {"Access-Control-Allow-Credentials" true}}}}])
   (re-frame/dispatch-sync [::initialize-db])
+  (re-frame/dispatch-sync [::view/init])
   (render-root))
