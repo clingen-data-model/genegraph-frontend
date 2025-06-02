@@ -11,6 +11,8 @@
       :out
       str/trim))
 
+(def current-version (version))
+
 (defn image-tag []
   (str
    "us-east1-docker.pkg.dev/"
@@ -20,19 +22,36 @@
    ":v"
    (version)))
 
+(defn update-index-html []
+  (spit "public/index.html"
+        (str/replace (slurp "public/index.html")
+                     #"main.*js"
+                     (str "main." current-version ".js"))))
+
+(defn revert-index-html []
+  (spit "public/index.html"
+        (str/replace (slurp "public/index.html")
+                     #"main.*js"
+                     "main.js")))
+
 (defn build-assets []
-  (shell "yarn release"))
+  #_(shell "yarn release")
+  (shell (str "yarn shadow-cljs release app --config-merge '{:release-version "
+              current-version
+              "}'")))
+
+
 
 (defn docker-push []
   (shell "docker"
-       "buildx"
-       "build"
-       "."
-       "--platform"
-       "linux/arm64"
-       "-t"
-       (image-tag)
-       "--push"))
+         "buildx"
+         "build"
+         "."
+         "--platform"
+         "linux/arm64"
+         "-t"
+         (image-tag)
+         "--push"))
 
 ;; The Ingress and Cert for this
 ;; are maintained in genegraph-api
@@ -80,10 +99,13 @@
          "-f"
          "-"))
 
+(update-index-html)
 (build-assets)
 (docker-push)
 (kubectl-apply (kubernetes-deployment))
 (kubectl-apply  (kubernetes-service))
+(revert-index-html)
+
 
 
 
