@@ -36,6 +36,8 @@
     :search-result (search/search-result-div)
     :assertion (assertion/assertion-detail-div component-def)))
 
+#_[:pre (with-out-str (cljs.pprint/pprint stack))]
+
 (def component-type->icon
   {:search-dialog icon/magnifying-glass
    :search-result icon/list-bullet})
@@ -51,18 +53,45 @@
     [:div
      {:class "flex-col"}
      (for [c (drop-last 2 stack)]
-       (component-nav-icon c))
-     #_[:pre (with-out-str (cljs.pprint/pprint stack))]]))
+       (component-nav-icon c))]))
 
-(defn app-div []
+#_(defn app-div []
   (let [stack @(re-frame/subscribe [::stack])]
     [:div
      {:class "container"}
      [:div
-      {:class "mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8 flex"}
       (nav-bar)
       (if-let [previous-component (->> stack reverse second)]
-        (render-component previous-component)
-        [:div])
-      (render-component (last stack))]])
-  )
+        [:div
+         [:div
+          {:class "fixed top-0 left-10 bottom-0 w-150  overflow-scroll"}
+          (render-component previous-component)]
+         [:div
+          {:class "fixed top-0 left-170 bottom-0 w-150 overflow-scroll"}
+          (render-component (last stack))]]
+
+        [:div
+         {:class "fixed top-0 left-10 w-100 overflow-scroll"}
+         (render-component (last stack))])]]))
+
+
+(defn app-div []
+  (let [stack @(re-frame/subscribe [::stack])
+        previous-component(->> stack reverse second)]
+    [:div
+     {:class "container"}
+     [:div
+      {:class "fixed top-0 left-0 bottom-0 overflow-y-auto"}
+      (nav-bar)]
+     (if previous-component
+       [:div
+        {:class "fixed top-0 left-10 bottom-0 w-120  overflow-y-auto"}
+        (render-component previous-component)]
+       [:div
+        {:class "fixed top-0 left-10 bottom-0 w-150 overflow-scroll"}
+        (render-component (last stack))])
+     (if previous-component
+       [:div
+        {:class "fixed top-0 bottom-0 left-130 w-full overflow-scroll"}
+        (render-component (last stack))]
+       [:div])]))

@@ -163,7 +163,7 @@ query ($symbol: String) {
 (defn search-div []
   [:div
    {:class "flex flex-col"}
-   (select-entity-type-div)
+   #_(select-entity-type-div)
    (query-list-div)])
 
 (defn search-result-div []

@@ -25,8 +25,6 @@
    "CG:DosageAutosomalRecessive" -1
    "CG:DosageSensitivityUnlikely" -2})
 
-
-
 (def assertion-query
   "  query ($iri: String) {
   assertion(iri: $iri) {
