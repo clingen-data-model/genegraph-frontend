@@ -45,7 +45,13 @@
    "CG:DosageNoEvidence" {:label "None"
                           :tooltip "No Evidence"}
    "CG:DosageAutosomalRecessive" {:label "None"
-                                  :tooltip "No Evidence"}})
+                                  :tooltip "Autosomal Recessive"}
+   "CG:NoAssessment" {:label "No Assessment"
+                      :tooltip "No Assessment"}
+   "CG:DosageMapConflict" {:label "Dosage Map Conflict"
+                           :tooltip "Dosage Map Conflict"}
+   "CG:ErrorInVariantDescription" {:label "Variant Error"
+                                   :tooltip "Error in Variant Description"}})
 
 (defn pill [curie]
   (let [{:keys [label]} (curie->pill curie {:label curie :tooltip curie})]

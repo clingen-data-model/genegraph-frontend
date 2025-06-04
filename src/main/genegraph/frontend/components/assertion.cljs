@@ -37,6 +37,7 @@
         curie
         label
       }
+      description
     }
     classification {
       curie
@@ -287,6 +288,13 @@ fragment mechanismProp on GeneticConditionMechanismProposition {
     ^{:key p}
     (gene-validity-proposition-div p)))
 
+(defn mechanism-propositions [propositions]
+  (for [p (filter
+           #(= "GeneticConditionMechanismProposition" (:__typename %))
+           propositions)]
+    ^{:key p}
+    (genetic-condition-mechanism-proposition p)))
+
 (defn feature-display [feature]
   ^{:key feature}
   [:div
@@ -297,10 +305,8 @@ fragment mechanismProp on GeneticConditionMechanismProposition {
     (:label feature)]
    [:div
     {:class "flex flex-col"}
-    (strongest-gv-assertions-div (:subjectOf feature))
-    #_(gv-proposition-with-strongest-classification )
-    #_(for [p (:subjectOf feature)]
-      (proposition-div p))]])
+    (mechanism-propositions (:subjectOf feature))
+    (strongest-gv-assertions-div (:subjectOf feature))]])
 
 (defn overlapping-features [assertion]
   (let [features (get-in assertion [:subject :variant :overlappingFeatures])
@@ -341,13 +347,26 @@ fragment mechanismProp on GeneticConditionMechanismProposition {
      ^{:key a}
      (variant-assertion-label-div a assertion-def))])
 
+(defn annotations-div [assertion]
+  [:div
+   {:class "py-6 flex flex-col gap-2"}
+   (for [annotation (:annotations assertion)]
+     ^{:key annotation}
+     [:div
+      {:class "flex"}
+      (some-> annotation :classification :curie common/pill)
+      [:div (:description annotation)]])])
+
 (defn assertion-detail-div [assertion-def]
   (if-let [assertion @(re-frame/subscribe [:resource (:iri assertion-def)])]
     [:div
      {:class "flex flex-1 p-10 flex-col"}
      (variant-assertion-label-div assertion)
+     (annotations-div assertion)
      (overlapping-features assertion)
-     (related-assertions assertion assertion-def)]
+     (related-assertions assertion assertion-def)
+     #_[:div
+      [:pre (with-out-str (cljs.pprint/pprint assertion))]]]
     [:div
      {:class "flex flex-1 p-10"}
      "nothing yet"]))
