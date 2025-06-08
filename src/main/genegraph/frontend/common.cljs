@@ -1,6 +1,8 @@
 (ns genegraph.frontend.common
   "Common display elements that do not belong to a specific page, component, or namespace, but can be used by all.")
 
+(defmulti main-view :__typename)
+
 (def curie->pill
   {"CG:Haploinsufficiency" {:label "HS"
                             :tooltip "Haploinsufficiency"}
@@ -52,6 +54,22 @@
                            :tooltip "Dosage Map Conflict"}
    "CG:ErrorInVariantDescription" {:label "Variant Error"
                                    :tooltip "Error in Variant Description"}})
+
+(def submitter-labels
+  {"GENCC:000111" "PanelApp Australia",
+   "GENCC:000115" "Broad Center for Mendelian Genomics",
+   "GENCC:000104" "Genomics England PanelApp",
+   "GENCC:000116" "Baylor College of Medicine Research Center",
+   "GENCC:000112" "G2P",
+   "GENCC:000113" "Franklin by Genoox",
+   "GENCC:000105" "Illumina",
+   "GENCC:000107" "Laboratory for Molecular Medicine",
+   "GENCC:000102" "ClinGen",
+   "GENCC:000106" "Invitae",
+   "GENCC:000110" "Orphanet",
+   "GENCC:000108" "Myriad Women’s Health",
+   "GENCC:000101" "Ambry Genetics",
+   "GENCC:000114" "King Faisal Specialist Hospital and Research Center"})
 
 (defn pill [curie]
   (let [{:keys [label]} (curie->pill curie {:label curie :tooltip curie})]

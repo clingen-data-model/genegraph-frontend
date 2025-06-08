@@ -16,6 +16,7 @@
   If we ever want to remove these styles, we need to add an explicit border
   color utility to any element that depends on these defaults.
 */
+/*
 @layer base {
   *,
   ::after,
@@ -25,3 +26,4 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+*/

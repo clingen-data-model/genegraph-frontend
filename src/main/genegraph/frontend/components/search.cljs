@@ -9,13 +9,18 @@
             [clojure.string :as str]))
 
 (def text-search-query
-"
-query ($symbol: String) {
+  "query ($symbol: String) {
   sequenceFeatureQuery(symbol: $symbol) {
     __typename
     iri
     label
+    type {
+      curie
+      label
+    }
     assertions {
+      curie
+      iri
       evidenceStrength {
         curie
       }
@@ -25,6 +30,8 @@ query ($symbol: String) {
           curie
           label
         }
+        ...geneValidityProp
+        ...mechanismProp
       }
       contributions {
         role {
@@ -39,7 +46,29 @@ query ($symbol: String) {
     }
   }
 }
-")
+
+fragment geneValidityProp on GeneValidityProposition {
+  modeOfInheritance {
+    curie
+    label
+  }
+  disease {
+    curie
+    label
+  }
+}
+
+fragment mechanismProp on GeneticConditionMechanismProposition {
+  mechanism {
+    curie
+  }
+  condition {
+    label
+    curie
+  }
+}"
+
+)
 
 (re-frame/reg-event-db
  ::select-entity-type
@@ -56,7 +85,7 @@ query ($symbol: String) {
  (fn [db [_ result]]
    (js/console.log "recieved result")
    (assoc db
-          :current-resource
+          :main
           (get-in result
                   [:response
                    :data

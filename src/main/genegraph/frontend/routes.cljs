@@ -12,7 +12,8 @@
             [genegraph.frontend.page.conflict-list :as conflict-list]
             [genegraph.frontend.view :as view]
             [genegraph.frontend.components.search :as search]
-            [genegraph.frontend.components.resource :as resource]))
+            [genegraph.frontend.components.resource :as resource]
+            [genegraph.frontend.shell :as shell]))
 
 ;;; Effects ;;;
 
@@ -175,6 +176,10 @@
      (when current-route
        [(-> current-route :data :view)])]))
 
-(defn router-component [{:keys [router]}]
+#_(defn router-component [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::current-route])]
     (view/app-div)))
+
+(defn router-component [{:keys [router]}]
+  (let [current-route @(re-frame/subscribe [::current-route])]
+    (shell/shell)))
