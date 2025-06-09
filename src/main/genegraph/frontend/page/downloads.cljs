@@ -1,4 +1,4 @@
-(ns genegraph.frontend.page.home
+(ns genegraph.frontend.page.downloads
   (:require [re-frame.core :as re-frame]
             [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]
@@ -6,6 +6,6 @@
             [clojure.string :as s]))
 
 
-(defn home []
-  [:div "home"])
+(defn downloads []
+  [:div "downloads"])
 

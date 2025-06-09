@@ -6,6 +6,9 @@
             [re-frame.core :as re-frame]
             [genegraph.frontend.nav :as nav]
             [genegraph.frontend.page.home :as home]
+            [genegraph.frontend.page.documentation :as documentation]
+            [genegraph.frontend.page.downloads :as downloads]
+            [genegraph.frontend.page.resource :as resource-page]
             [genegraph.frontend.page.gencc-home :as gencc-home]
             [genegraph.frontend.page.gencc-list :as gencc-list]
             [genegraph.frontend.page.annotations :as annotations]
@@ -80,18 +83,57 @@
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
-                (re-frame/dispatch [::nav/nav-state nil])
-                (js/console.log "Entering home page")
-                #_(re-frame/dispatch [::home/request-conflict-list]))
+                (js/console.log "Entering home page"))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving home page"))}]}]
+   ["downloads"
+    {:name      :routes/downloads
+     :view      downloads/downloads
+     :link-text "Downloads"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering downloads page"))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving downloads page"))}]}]
+   ["documenation"
+    {:name      :routes/documentation
+     :view      documentation/documentation
+     :link-text "Documentation"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering documentation page"))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving documentation page"))}]}]
+   ["r/:id"
+    {:name      :routes/resource
+     :view      resource-page/resource
+     :link-text "Resource"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :parameters {:path [:id]}
+       :start (fn [params]
+                (re-frame/dispatch
+                 [::resource-page/set-current-resource
+                  #_params
+                  (get-in params [:path :id])])
+                (js/console.log "Entering resource page"))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving resource page"))}]}]
    ["gencc-home"
     {:name      :routes/gencc-home
      :view      gencc-home/home
      :link-text "GenCC"
      :controllers
-     [{;; Do whatever initialization needed for home page
+     [{ ;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
                 (re-frame/dispatch [::nav/nav-state :hidden])

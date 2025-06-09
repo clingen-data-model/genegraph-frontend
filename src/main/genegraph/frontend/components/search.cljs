@@ -13,6 +13,7 @@
   sequenceFeatureQuery(symbol: $symbol) {
     __typename
     iri
+    curie
     label
     type {
       curie
@@ -79,8 +80,9 @@ fragment mechanismProp on GeneticConditionMechanismProposition {
 (re-frame/reg-sub
  ::selected-entity-type
  :-> ::selected-entity-type)
-
-(re-frame/reg-event-db
+    :push-state {:route :routes/resource
+                 :params {:path {:id "CG:12345"}}}
+#_(re-frame/reg-event-db
  ::recieve-text-search-result
  (fn [db [_ result]]
    (js/console.log "recieved result")
@@ -91,23 +93,28 @@ fragment mechanismProp on GeneticConditionMechanismProposition {
                    :data
                    :sequenceFeatureQuery]))))
 
+
+;; seems to be working now
+;; still makes me nervous
+(re-frame/reg-event-fx
+ ::recieve-text-search-result
+ (fn [db [_ result]]
+   (let [feature (get-in result [:response :data :sequenceFeatureQuery])]
+     (js/console.log "recieved result")
+     (js/console.log (:curie feature))
+     {:db (assoc db :main feature)
+      :push-state [:routes/resource {:id (:curie feature)}]})))
+
 (re-frame/reg-event-fx
  ::text-search
  (fn [{:keys [db]} [_ text]]
-   (js/console.log "searching for " text)
+   (js/console.log "searching for " (::search-input db))
    {:fx [[:dispatch
           [::re-graph/query
            {:id ::query
             :query text-search-query
-            :variables {:symbol (str/upper-case text)}   ; change 
+            :variables {:symbol (str/upper-case (::search-input db))} ; change 
             :callback [::recieve-text-search-result]}]]]}))
-
-
-
-
-
-
-
 
 (defn text-search-div []
   [:div

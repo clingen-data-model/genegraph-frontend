@@ -114,7 +114,7 @@
       {:role "list", :class "divide-y divide-gray-200"}
       (for [a assertions]
         (mechanism-assertion a))]]
-    [:div]))
+    nil))
 
 
 ;; TODO maybe lighter gray for classifications
@@ -168,14 +168,14 @@
        "divide-y divide-gray-100 overflow-hidden bg-white shadow-xs ring-1 ring-gray-900/5 sm:rounded-xl"}
       (for [a assertions]
         (validity-assertion a))]]
-    [:div]))
+    nil))
 
 
 (defmethod common/main-view "SequenceFeature" [feature]
   (let [grouped-assertions (group-by #(get-in % [:subject :__typename])
                                      (:assertions feature))]
     [:div
-     {:class "flex flex-col gap-12"}
+     {:class "flex flex-col gap-6"}
      (feature-title feature)
      #_(feature-types feature)
      (mechanism-assertions (get grouped-assertions
