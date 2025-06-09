@@ -207,7 +207,7 @@
       (comment
         "Current: \"bg-gray-800 text-white\", Default: \"text-gray-400 hover:text-white hover:bg-gray-800\"")
       [:a
-       {:href "#",
+       {:href (rfe/href :routes/home)
         :class
         "group flex gap-x-3 rounded-md bg-gray-800 p-3 text-sm/6 font-semibold text-white"}
        [:svg
@@ -226,26 +226,26 @@
        [:span {:class "sr-only"} "Home"]]]
      [:li
       [:a
-       {:href "#",
+       {:href (rfe/href :routes/downloads)
         :class
         "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
        icon/arrow-down-tray
        [:span {:class "sr-only"} "Downloads"]]]
      [:li
       [:a
-       {:href "#",
+       {:href (rfe/href :routes/documentation)
         :class
         "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
        icon/book-open
        [:span {:class "sr-only"} "Documentation"]]]
-     [:li
+     #_[:li
       [:a
        {:href "#",
         :class
         "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
        icon/funnel
        [:span {:class "sr-only"} "Filters"]]]
-     [:li
+     #_[:li
       [:a
        {:href "#",
         :class
