@@ -1,5 +1,12 @@
 (ns genegraph.frontend.common
-  "Common display elements that do not belong to a specific page, component, or namespace, but can be used by all.")
+  "Common display elements that do not belong to a specific page, component, or namespace, but can be used by all."
+  (:require [clojure.string :as s]))
+
+(defn kw->iri-id [k]
+  (-> k str (s/replace #":" "") (s/replace #"/" "_")))
+
+(defn iri-id->kw [id]
+  (apply keyword (s/split id #"_")))
 
 (defmulti main-view :__typename)
 

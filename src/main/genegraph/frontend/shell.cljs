@@ -10,10 +10,11 @@
             [genegraph.frontend.view.sequence-feature]))
 
 
+
+
 (re-frame/reg-sub
  ::main
  :-> :main)
-
 
 ;; Part of pre-existing template
 ;; Not currently designed or used
@@ -187,86 +188,51 @@
           "Reports"]]]]]]]])
 
 (comment "Static sidebar for desktop")
-(defn sidebar []
-  [:div
-   {:class
-    "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4"}
-   [:div
-    {:class "flex h-16 shrink-0 items-center justify-center"}
-    [:img
-     {:class "h-8 w-auto",
-      :src
-      #_"img/clingen-logo-vp.svg"
-      "https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500",
-      :alt "Genegraph"}]]
-   [:nav
-    {:class "mt-8"}
-    [:ul
-     {:role "list", :class "flex flex-col items-center space-y-1"}
-     [:li
-      (comment
+(def sections
+  [{:route :routes/home
+    :name "Home"
+    :icon icon/home}
+   {:route :routes/downloads
+    :name "Downloads"
+    :icon icon/arrow-down-tray}
+   {:route :routes/documentation
+    :name "Documentation"
+    :icon icon/book-open}])
+
+    (comment
         "Current: \"bg-gray-800 text-white\", Default: \"text-gray-400 hover:text-white hover:bg-gray-800\"")
+
+(defn sidebar-section [section current-route]
+  ^{:key {:place :sidebar :section section}}
+  [:li
+   [:a
+    {:href (rfe/href (:route section))
+     :class
+     (if (= (:route section) (get-in current-route [:data :name]))
+       "group flex gap-x-3 rounded-md bg-sky-600 p-3 text-sm/6 font-semibold text-sky-100"
+       "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-sky-400 hover:bg-sky-700 hover:text-sky-100")}
+    (:icon section)
+    [:span {:class "sr-only"} (:name section)]]])
+
+(defn sidebar []
+  (let [current-route @(re-frame/subscribe [:genegraph.frontend.routes/current-route])]
+    [:div
+     {:class
+      "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-sky-900 lg:pb-4"}
+     [:div
+      {:class "flex h-16 shrink-0 items-center justify-center"}
       [:a
-       {:href (rfe/href :routes/home)
-        :class
-        "group flex gap-x-3 rounded-md bg-gray-800 p-3 text-sm/6 font-semibold text-white"}
-       [:svg
-        {:class "size-6 shrink-0",
-         :fill "none",
-         :viewBox "0 0 24 24",
-         :stroke-width "1.5",
-         :stroke "currentColor",
-         :aria-hidden "true",
-         :data-slot "icon"}
-        [:path
-         {:stroke-linecap "round",
-          :stroke-linejoin "round",
-          :d
-          "m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"}]]
-       [:span {:class "sr-only"} "Home"]]]
-     [:li
-      [:a
-       {:href (rfe/href :routes/downloads)
-        :class
-        "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
-       icon/arrow-down-tray
-       [:span {:class "sr-only"} "Downloads"]]]
-     [:li
-      [:a
-       {:href (rfe/href :routes/documentation)
-        :class
-        "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
-       icon/book-open
-       [:span {:class "sr-only"} "Documentation"]]]
-     #_[:li
-      [:a
-       {:href "#",
-        :class
-        "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
-       icon/funnel
-       [:span {:class "sr-only"} "Filters"]]]
-     #_[:li
-      [:a
-       {:href "#",
-        :class
-        "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"}
-       [:svg
-        {:class "size-6 shrink-0",
-         :fill "none",
-         :viewBox "0 0 24 24",
-         :stroke-width "1.5",
-         :stroke "currentColor",
-         :aria-hidden "true",
-         :data-slot "icon"}
-        [:path
-         {:stroke-linecap "round",
-          :stroke-linejoin "round",
-          :d "M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"}]
-        [:path
-         {:stroke-linecap "round",
-          :stroke-linejoin "round",
-          :d "M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"}]]
-       [:span {:class "sr-only"} "Reports"]]]]]])
+       {:href "https://clinicalgenome.org"}
+       [:img
+        {:class "h-8 w-auto",
+         :src "img/clingen-logo-white.svg"
+         :alt "Genegraph"}]]]
+     [:nav
+      {:class "mt-8"}
+      [:ul
+       {:role "list", :class "flex flex-col items-center space-y-1"}
+       (for [s sections]
+         (sidebar-section s current-route))]]]))
 
 (re-frame/reg-event-db
  ::update-search-input

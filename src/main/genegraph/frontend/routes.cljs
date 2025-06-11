@@ -4,6 +4,7 @@
             [reitit.core :as r]
             [reitit.frontend.controllers :as rfc]
             [re-frame.core :as re-frame]
+            [genegraph.frontend.common :as common]
             [genegraph.frontend.nav :as nav]
             [genegraph.frontend.page.home :as home]
             [genegraph.frontend.page.documentation :as documentation]
@@ -111,12 +112,28 @@
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving documentation page"))}]}]
+   ["documenation/:id"
+    {:name      :routes/documentation-term
+     :view      documentation/documentation-term
+     :link-text "Documentation Term"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :parameters {:path [:id]}
+       :start (fn [params]
+                (re-frame/dispatch
+                 [::documentation/set-current-entity
+                  (common/iri-id->kw (get-in params [:path :id]))])
+                (js/console.log "Entering documentation page for entity"))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving documentation page"))}]}]
    ["r/:id"
     {:name      :routes/resource
      :view      resource-page/resource
      :link-text "Resource"
      :controllers
-     [{;; Do whatever initialization needed for home page
+     [{ ;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :parameters {:path [:id]}
        :start (fn [params]

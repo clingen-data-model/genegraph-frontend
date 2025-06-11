@@ -5,6 +5,18 @@
             [genegraph.frontend.icon :as icon]
             [clojure.string :as s]))
 
+(def home-sections
+  [{:title "Download data"
+    :description "Full historical archive, or just the latest. JSON or RDF. Just a summary or all the facts."
+    :icon icon/arrow-down-tray
+    :route :routes/downloads
+    :link-text "To downloads"}
+   {:title "Read documentation"
+    :description "Complete documentation of all classes, attributes, properties, and value sets."
+    :icon icon/book-open
+    :route :routes/documentation
+    :link-text "To documentation"}])
+
 
 (defn home []
   [:div
@@ -16,7 +28,10 @@
      [:h2
       {:class
        "text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl"}
-      "Genegraph makes ClinGen Gene Validity machine-ready"]
+      [:span
+       {:class "text-sky-700"}
+       "Genegraph:"]
+      " computable ClinGen evidence"]
      [:p
       {:class "mt-6 text-lg/8 text-gray-600"}
       "Download the complete ClinGen Gene Validity data set, including the full curation history, as well as rich, detailed evidence. Leverages the SEPIO and GA4GH GKS data models."]]
@@ -25,47 +40,27 @@
      [:dl
       {:class
        "grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3"}
-      [:div
-       {:class "flex flex-col"}
-       [:dt
-        {:class "text-base/7 font-semibold text-gray-900"}
+      (for [s home-sections]
+        ^{:key s}
         [:div
-         {:class
-          "mb-6 flex size-10 items-center justify-center rounded-lg bg-indigo-600"}
-         [:div {:class "size-6 text-white"}
-          icon/arrow-down-tray]]
-        "Download data"]
-       [:dd
-        {:class "mt-1 flex flex-auto flex-col text-base/7 text-gray-600"}
-        [:p
-         {:class "flex-auto"}
-         "Full historical archive, or just the latest. JSON or RDF. Just a summary or all the facts."]
-        [:p
-         {:class "mt-6"}
-         [:a
-          {:href (rfe/href :routes/downloads)
-           :class "text-sm/6 font-semibold text-indigo-600"}
-          "To downloads"
-          [:span {:aria-hidden "true"} "→"]]]]]
-      [:div
-       {:class "flex flex-col"}
-       [:dt
-        {:class "text-base/7 font-semibold text-gray-900"}
-        [:div
-         {:class
-          "mb-6 flex size-10 items-center justify-center rounded-lg bg-indigo-600"}
-         [:div {:class "size-6 text-white"}
-          icon/book-open]]
-        "Read documentation"]
-       [:dd
-        {:class "mt-1 flex flex-auto flex-col text-base/7 text-gray-600"}
-        [:p
-         {:class "flex-auto"}
-         "Complete documentation of all classes, attributes, properties, and value sets."]
-        [:p
-         {:class "mt-6"}
-         [:a
-          {:href (rfe/href :routes/documentation)
-           :class "text-sm/6 font-semibold text-indigo-600"}
-          "To documentation"
-          [:span {:aria-hidden "true"} "→"]]]]]]]]])
+         {:class "flex flex-col"}
+         [:dt
+          {:class "text-base/7 font-semibold text-gray-900"}
+          [:div
+           {:class
+            "mb-6 flex size-10 items-center justify-center rounded-lg bg-sky-700"}
+           [:div {:class "size-6 text-sky-100"}
+            (:icon s)]]
+          (:title s)]
+         [:dd
+          {:class "mt-1 flex flex-auto flex-col text-base/7 text-gray-600"}
+          [:p
+           {:class "flex-auto"}
+           (:description s)]
+          [:p
+           {:class "mt-6"}
+           [:a
+            {:href (rfe/href (:route s))
+             :class "text-sm/6 font-semibold text-sky-500"}
+            (:link-text s)
+            [:span {:aria-hidden "true"} "→"]]]]])]]]])
