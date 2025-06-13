@@ -1,5 +1,5 @@
 (ns genegraph.frontend.shell
-  (:require [re-frame.core :as re-frame]
+  (:require [re-frame.core :as rf]
             [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.icon :as icon]
@@ -12,15 +12,19 @@
 
 
 
-(re-frame/reg-sub
+(rf/reg-sub
  ::main
  :-> :main)
+
+(rf/reg-sub
+ ::secondary-view
+ :-> :secondary-view)
 
 ;; Part of pre-existing template
 ;; Not currently designed or used
 (comment
   "Off-canvas menu for mobile, show/hide based on off-canvas menu state.")
-(defn mobile-menu []
+#_(defn mobile-menu []
   [:div
    {:class "relative z-50 lg:hidden",
     :role "dialog",
@@ -191,13 +195,16 @@
 (def sections
   [{:route :routes/home
     :name "Home"
-    :icon icon/home}
+    :icon icon/home
+    :active-on #{:routes/home}}
    {:route :routes/downloads
     :name "Downloads"
-    :icon icon/arrow-down-tray}
+    :icon icon/arrow-down-tray
+    :active-on #{:routes/downloads}}
    {:route :routes/documentation
     :name "Documentation"
-    :icon icon/book-open}])
+    :icon icon/book-open
+    :active-on #{:routes/documentation :routes/documentation-term}}])
 
     (comment
         "Current: \"bg-gray-800 text-white\", Default: \"text-gray-400 hover:text-white hover:bg-gray-800\"")
@@ -208,14 +215,14 @@
    [:a
     {:href (rfe/href (:route section))
      :class
-     (if (= (:route section) (get-in current-route [:data :name]))
+     (if (get (:active-on section) (get-in current-route [:data :name]))
        "group flex gap-x-3 rounded-md bg-sky-600 p-3 text-sm/6 font-semibold text-sky-100"
        "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-sky-400 hover:bg-sky-700 hover:text-sky-100")}
     (:icon section)
     [:span {:class "sr-only"} (:name section)]]])
 
 (defn sidebar []
-  (let [current-route @(re-frame/subscribe [:genegraph.frontend.routes/current-route])]
+  (let [current-route @(rf/subscribe [:genegraph.frontend.routes/current-route])]
     [:div
      {:class
       "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-sky-900 lg:pb-4"}
@@ -234,7 +241,7 @@
        (for [s sections]
          (sidebar-section s current-route))]]]))
 
-(re-frame/reg-event-db
+(rf/reg-event-db
  ::update-search-input
  (fn [db [_ value]]
    (assoc db ::search/search-input value)))
@@ -244,7 +251,7 @@
    {:class "grid flex-1 grid-cols-1 my-1"
     :on-submit (fn [e]
                  (.preventDefault e)
-                 (re-frame/dispatch
+                 (rf/dispatch
                   [::search/text-search]))}
    
    [:input
@@ -253,10 +260,10 @@
      :aria-label "Search",
      :class "col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6 border-none focus:ring-1 rounded-full",
      :placeholder "Search"
-     :on-change #(re-frame/dispatch [::update-search-input (-> % .-target .-value)])
+     :on-change #(rf/dispatch [::update-search-input (-> % .-target .-value)])
      :on-key-down (fn [e]
                     (case (.-key e)
-                      "Enter" (re-frame/dispatch
+                      "Enter" (rf/dispatch
                                [::search/text-search])
                       nil))}]
    [:svg
@@ -374,7 +381,7 @@
       :d "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"}]]])
 
 #_(defn main []
-  (let [current @(re-frame/subscribe [::main])]
+  (let [current @(rf/subscribe [::main])]
     [:main
      ;; Main area
      {:class "xl:pl-96"}
@@ -386,43 +393,50 @@
       #_[:pre (with-out-str (cljs.pprint/pprint current))]]]))
 
 (defn main []
-  (let [current-route @(re-frame/subscribe [:genegraph.frontend.routes/current-route])]
+  (let [current-route @(rf/subscribe [:genegraph.frontend.routes/current-route])
+        secondary-view-item @(rf/subscribe [::secondary-view])]
     [:main
      ;; Main area
-     {:class "xl:pl-96"}
+     {:class (if secondary-view-item "xl:pl-96" "")}
      (when current-route
        [(-> current-route :data :view)])]))
 
 (defn secondary []
-  [:aside
-   ;; Secondary column (hidden on smaller screens)
-   {:class
-    "fixed top-16 bottom-0 left-20 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block"}])
+  (if-let [secondary-view-item @(rf/subscribe [::secondary-view])]
+    [:aside
+     ;; Secondary column (hidden on smaller screens)
+     {:class
+      "fixed top-16 bottom-0 left-20 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block"}
+     (common/secondary-view secondary-view-item)]
+    [:div]))
+
+(defn profile []
+  [:div
+   {:class "flex items-center gap-x-4 lg:gap-x-6"}
+   (notifications)
+   (comment "Separator")
+   [:div
+    {:class "hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10",
+     :aria-hidden "true"}]
+   (comment "Profile dropdown")
+   (profile-dropdown)])
 
 (defn shell []
   [:div
-   (mobile-menu)
+   #_(mobile-menu)
    (sidebar)
    [:div
     {:class "lg:pl-20"}
     [:div
      {:class
       "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"}
-     (open-sidebar-button)
+     #_(open-sidebar-button)
      (comment "Separator")
      [:div
       {:class "h-6 w-px bg-gray-900/10 lg:hidden", :aria-hidden "true"}]
      [:div
       {:class "flex flex-1 gap-x-4 self-stretch lg:gap-x-6 bg-white"}
       (search-form)
-      #_[:div
-         {:class "flex items-center gap-x-4 lg:gap-x-6"}
-         (notifications)
-         (comment "Separator")
-         [:div
-          {:class "hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10",
-           :aria-hidden "true"}]
-         (comment "Profile dropdown")
-         (profile-dropdown)]]]
+      #_(profile)]]
     (main)]
    (secondary)])

@@ -63,10 +63,10 @@
      {:class "mt-2 max-w-4xl text-sm text-gray-500"}
      "All downloads are generated every six hours using the most recent published data from ClinGen. They are made available in JSON-LD and RDF n-triples formats, compressed into an archive package."]]
    [:ul
-    {:role "list", :class "divide-y divide-gray-200 py-10"}
+    {:role "list", :class "py-10"}
     (for [s download-set]
       ^{:key s}
-      [:li {:class "py-12"}
+      [:li {:class "py-4"}
        [:div
         {:class "pb-5"}
         [:h3 {:class "text-base font-semibold text-gray-900"}

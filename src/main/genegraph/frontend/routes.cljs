@@ -84,7 +84,9 @@
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
-                (js/console.log "Entering home page"))
+                (js/console.log "Entering home page")
+                (re-frame/dispatch
+                 [::common/set-secondary-view nil]))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving home page"))}]}]
@@ -96,7 +98,9 @@
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
-                (js/console.log "Entering downloads page"))
+                (js/console.log "Entering downloads page")
+                (re-frame/dispatch
+                 [::common/set-secondary-view nil]))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving downloads page"))}]}]
@@ -108,7 +112,9 @@
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
-                (js/console.log "Entering documentation page"))
+                (js/console.log "Entering documentation page")
+                (re-frame/dispatch
+                 [::common/set-secondary-view nil]))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving documentation page"))}]}]
@@ -124,6 +130,8 @@
                 (re-frame/dispatch
                  [::documentation/set-current-entity
                   (common/iri-id->kw (get-in params [:path :id]))])
+                (re-frame/dispatch
+                 [::common/set-secondary-view {:__typename :documentation-list}])
                 (js/console.log "Entering documentation page for entity"))
        ;; Teardown can be done here.
        :stop  (fn [& params]

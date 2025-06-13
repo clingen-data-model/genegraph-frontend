@@ -1,6 +1,7 @@
 (ns genegraph.frontend.common
   "Common display elements that do not belong to a specific page, component, or namespace, but can be used by all."
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [re-frame.core :as rf]))
 
 (defn kw->iri-id [k]
   (-> k str (s/replace #":" "") (s/replace #"/" "_")))
@@ -8,7 +9,15 @@
 (defn iri-id->kw [id]
   (apply keyword (s/split id #"_")))
 
+(rf/reg-event-db
+ ::set-secondary-view
+ (fn [db [_ data]]
+   (js/console.log "setting secondary view")
+   (assoc db :secondary-view data)))
+
 (defmulti main-view :__typename)
+
+(defmulti secondary-view :__typename)
 
 (def curie->pill
   {"CG:Haploinsufficiency" {:label "HS"

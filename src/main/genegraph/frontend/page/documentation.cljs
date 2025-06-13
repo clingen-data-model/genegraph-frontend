@@ -82,6 +82,13 @@
       [:ul
        {:role "list", :class "divide-y divide-gray-200"}
        (for [p (:properties entity)]
+         ^{:key p}
          [:li {:class "py-4"}
           [:div p]])]]
      #_[:pre (with-out-str (cljs.pprint/pprint schema/schema-by-id))]]))
+
+
+(defmethod common/secondary-view :documentation-list []
+  [:div
+   (for [t entity-types]
+     (entity-list t))])
