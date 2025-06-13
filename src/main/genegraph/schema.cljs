@@ -1,5 +1,7 @@
 (ns genegraph.schema)
 
+
+
 (def schema
   {:interfaces
    {:rdfs/Resource
@@ -31,7 +33,7 @@
     :cg/Contribution
     {:properties
      [:cg/agent :dc/date :cg/role]}
-    :cg/EvidenceLine     ;; add to base
+    :cg/EvidenceLine ;; add to base
     {:properties
      [:cg/evidence :cg/strengthScore :cg/evidenceStrength]}
     :cg/CanonicalVariant ;; Refactor around CatVRS? not right now
@@ -132,8 +134,8 @@
     :cg/family {:type :cg/Family}
     :cg/alleleFrequency {} ;; investigate
     :cg/phenotype {:type :owl/Class :cg/note "recommended to use HPO terms"}
-    :cg/upperConfidenceLimit {} ; investigate
-    :cg/member {:type (list :cg/Proband)}            ; update to family member?
+    :cg/upperConfidenceLimit {}           ; investigate
+    :cg/member {:type (list :cg/Proband)} ; update to family member?
     :cg/disease {:type :owl/Class}
     :dc/abstract {:type 'String}
     :cg/statisticalSignificanceValueType {} ;;investigate
@@ -147,20 +149,20 @@
     :cg/statisticalSignificanceType {:type :owl/Class} ; also investigate
     :cg/phenotypePositiveAllelePositive {}             ; boolean?
     :cg/modeOfInheritance {:type :owl/Class :cg/note "domain is HPO terms for MOI"} 
-    :cg/demonstrates {}               ; investigate, think is :owl/Class
-    :ga4gh/location {}                    ; bring in from GA4GH
+    :cg/demonstrates {}             ; investigate, think is :owl/Class
+    :ga4gh/location {}              ; bring in from GA4GH
     :cg/proband {:type :cg/Proband}
     :cg/condition {:type :owl/Class}
     :owl/sameAs {:type (list :owl/Class)}
     :cg/strengthScore {:type 'Float}
     :cg/phenotypeFreeText {:type 'String}
-    :cg/controlCohort {}                  ; investigate
-    :cg/alleleMappings {} ; ga4gh allele list
+    :cg/controlCohort {}                ; investigate
+    :cg/alleleMappings {}               ; ga4gh allele list
     :cg/gene {:type :so/SequenceFeature}
     :so/ChromosomeBand {:type 'String} ; should maybe be sequence feature
     :cg/detectionMethod {:type :owl/Class} ;; investigate may actually be 'String
     :cg/estimatedLodScore {:type 'Float}
-    :cg/statisticalSignificanceValue {}  ;; investigate
+    :cg/statisticalSignificanceValue {} ;; investigate
     :skos/hiddenLabel {:type (list 'String)}
     :cg/mechanism {:type :owl/Class}}
 
@@ -346,5 +348,57 @@
     :cg/RecurationDiscrepancyResolution
     {:rdfs/label "Recuration Discrepancy Resolution"}}})
 
+(def type-mapping
+  {:interfaces :cg/Interface
+   :properties :rdf/Property
+   :classes :owl/Class
+   :value-sets :cg/ValueSet
+   :concepts :skos/Concept})
+
+(defn add-types [schema]
+  (apply
+   merge 
+   (map
+    (fn [[k v]]
+      (update-vals v (fn [v1] (assoc v1 :rdf/type (get type-mapping k)))))
+    schema)))
+
+#_(defn add-member-refs [schema]
+  (reduce
+   (fn [s1 [vs-kw vs]]
+     (reduce
+      (fn [s2 concept] (update s2 concept assoc :skos/inScheme vs-kw))
+      s1
+      (:skos/member vs)))
+   schema
+   (filter (fn [[k v]] (= :cg/ValueSet (:rdf/type v))) schema)))
+
+(defn append-item [m k i]
+  (if-let [v (get m k)]
+    (assoc m k (conj v i))
+    (assoc m k [i])))
+
+(defn add-member-refs [schema]
+  (reduce
+   (fn [s1 [vs-kw vs]]
+     (reduce
+      (fn [s2 concept] (update s2 concept append-item :skos/inScheme vs-kw))
+      s1
+      (:skos/member vs)))
+   schema
+   (filter (fn [[k v]] (= :cg/ValueSet (:rdf/type v))) schema)))
+
+(defn add-property-class-refs [schema]
+  (reduce
+   (fn [s1 [vs-kw vs]]
+     (reduce
+      (fn [s2 concept] (update s2 concept append-item :used-in vs-kw))
+      s1
+      (:properties vs)))
+   schema
+   (filter (fn [[k v]] (= :owl/Class (:rdf/type v))) schema)))
+
 (def schema-by-id
-  (apply merge (vals schema)))
+  (-> (add-types schema)
+      add-member-refs
+      add-property-class-refs))

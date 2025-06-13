@@ -26,6 +26,9 @@
    {:type :concepts
     :label "Concepts"}])
 
+(defn term-href [term]
+  (rfe/href :routes/documentation-term {:id (common/kw->iri-id term)}))
+
 (defn entity-list [entity-class]
   ^{:key entity-class}
   [:div
@@ -42,7 +45,7 @@
       [:li
        {:class "py-4"}
        [:a
-        {:href (rfe/href :routes/documentation-term {:id (common/kw->iri-id k)})}
+        {:href (term-href k)}
         (str k)]])]])
 
 (defn documentation []
@@ -57,35 +60,71 @@
    (for [t entity-types]
      (entity-list t))])
 
-#_(defn kw->name [kw]
-)
+(defn term-list [terms]
+  [:ul
+   {:role "list", :class "divide-y divide-gray-200"}
+   (for [t terms]
+     ^{:key t}
+     [:li {:class "py-4"}
+      [:a
+       {:href (term-href t)}
+       t]])])
 
+(defmulti entity-detail :rdf/type)
 
+(defmethod entity-detail :owl/Class [entity entity-kw]
+  [:div
+   [:div
+    {:class "border-b border-gray-200 pb-5 pt-10"}
+    [:h3 {:class "text-base font-semibold text-gray-900"} "properties"]]
+   (term-list (:properties entity))])
+
+(defmethod entity-detail :rdf/Property [entity entity-kw]
+  [:div
+   [:div
+    {:class "border-b border-gray-200 pb-5 pt-10"}
+    [:h3 {:class "text-base font-semibold text-gray-900"} "classes using property"]]
+   (term-list (:used-in entity))])
+
+(defmethod entity-detail :cg/ValueSet [entity entity-kw]
+  [:div
+   [:div
+    {:class "border-b border-gray-200 pb-5 pt-10"}
+    [:h3 {:class "text-base font-semibold text-gray-900"}
+     "members"]]
+   (term-list (:skos/member entity))])
+
+(defmethod entity-detail :skos/Concept [entity entity-kw]
+  [:div
+   [:div
+    {:class "border-b border-gray-200 pb-5 pt-10"}
+    [:h3 {:class "text-base font-semibold text-gray-900"}
+     "member of value sets"]]
+   (term-list (:skos/inScheme entity))])
+
+(defmethod entity-detail :default [entity entity-kw]
+  [:div])
+
+(defn entity-title [entity entity-kw]
+  [:div
+   {:class "border-b border-gray-200 pb-5"}
+   [:h3
+    {:class "text-base font-semibold text-gray-900"}
+    entity-kw]
+   [:p (:rdf/type entity)]
+   [:p (:type entity)]
+   [:p
+    {:class "mt-2 max-w-4xl text-sm text-gray-500"}
+    (:dc/description entity)]])
 
 (defn documentation-term []
   (let [entity-kw @(rf/subscribe [::current-entity])
         entity (get schema/schema-by-id entity-kw)]
     [:div
      {:class "px-12 py-12"}
-     [:div
-      {:class "border-b border-gray-200 pb-5"}
-      [:h3
-       {:class "text-base font-semibold text-gray-900"}
-       entity-kw]
-      [:p
-       {:class "mt-2 max-w-4xl text-sm text-gray-500"}
-       (:dc/description entity)]]
-     [:div
-      [:div
-       {:class "border-b border-gray-200 pb-5 pt-10"}
-       [:h3 {:class "text-base font-semibold text-gray-900"} "properties"]] 
-      [:ul
-       {:role "list", :class "divide-y divide-gray-200"}
-       (for [p (:properties entity)]
-         ^{:key p}
-         [:li {:class "py-4"}
-          [:div p]])]]
-     #_[:pre (with-out-str (cljs.pprint/pprint schema/schema-by-id))]]))
+     (entity-title entity entity-kw)
+     (entity-detail entity entity-kw)
+     #_[:pre (with-out-str (cljs.pprint/pprint entity))]]    ))
 
 
 (defmethod common/secondary-view :documentation-list []
