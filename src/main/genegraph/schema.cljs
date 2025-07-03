@@ -1,7 +1,5 @@
 (ns genegraph.schema)
 
-
-
 (def schema
   {:interfaces
    {:rdfs/Resource
@@ -13,16 +11,19 @@
      [:rdfs/label :rdf/type :dc/description :dc/source :dc/description :skos/inScheme]}}
    :classes
    {:owl/Class
-    {:properties
+    {:dc/description "A class of resources. Ontological terms are typically represented as classes."
+     :properties
      [:rdfs/subClassOf]}
     :cg/Agent
-    {}
+    {:dc/description "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity."}
     :cg/ValueSet
-    {:properties
+    {:dc/description "Terms drawn from one or more terminologies and defined as a separate set, generally for specific coding purposes and given a formal designation."
+     :properties
      [:skos/member]}
     :cg/GeneticConditionMechanismProposition
     {:rdfs/label "Genetic Condition Mechanism Proposition"
      :dc/description "The proposition that a change of function of the given feature with the associated mechanism causes the given condition."
+     :cg/review true
      :properties
      [:cg/feature :cg/mechanism :cg/condition :cg/assertions]}
     :cg/EvidenceStrengthAssertion
@@ -31,10 +32,13 @@
      :properties
      [:cg/subject :cg/annotations :cg/evidenceStrength :cg/contributions :dc/date :cg/evidence :cg/strengthScore]}
     :cg/Contribution
-    {:properties
+    {:dc/description "An action or set of actions performed by an agent toward the creation, modification, evaluation, or deprecation of an artifact."
+     :properties
      [:cg/agent :dc/date :cg/role]}
     :cg/EvidenceLine ;; add to base
-    {:properties
+    {:dc/description "An evidence line represents an independent and meaningful argument for or against a particular proposition, that is based on the interpretation of one or more pieces of information as evidence."
+     :skos/exactMatch "http://purl.obolibrary.org/obo/SEPIO_0000002"
+     :properties
      [:cg/evidence :cg/strengthScore :cg/evidenceStrength]}
     :cg/CanonicalVariant ;; Refactor around CatVRS? not right now
     {:rdfs/label "Cannonical Allele"
@@ -53,44 +57,57 @@
      [:cg/subject :cg/evidence :cg/classification :cg/contributions]}
     :cg/GeneValidityProposition
     {:rdfs/label "Gene Validity Proposition"
-     :dc/description "The proposition that variants affecting a gene are causative of a disease, given a mode of inheritance."
+     :dc/description "The proposition that variants affecting a gene are causative of a disease, given a mode of inheritance. Such variants are therefore valid to report to patients as pathogenic, given appropriate variant evaluation criteria."
      :properties
      [:cg/gene :cg/modeOfInheritance :cg/disease]}
     :cg/VariantObservation ;; Maybe want to use just Observation, FHIR style? Let's do that
-    {:properties
+    {:dc/description
+     "A recorded instance of observing a specific genetic variant in a sample or individual."
+     :properties
      [:cg/proband :cg/variant]}
     :cg/Proband
-    {:cg/note "There are other properties here that should be refactored to other parts of the model. Specifically, zygosity, genotyping_method, etc are part of variant detection."
+    {:dc/description "The affected family member who seeks medical attention for a genetic disorder thereby bringing the family under study."
+     :cg/note "There are other properties here that should be refactored to other parts of the model. Specifically, zygosity, genotyping_method, etc are part of variant detection."
      :properties
      [:cg/observations :cg/family :cg/phenotype]}
     :cg/FunctionalAlteration
-    {:properties
+    {:dc/description "A change in protein or gene function caused by a genetic variant, affecting normal biological processes."
+     :properties
      []
      :cg/note "Currently does not support properties beyond standard Resource properties"}
     :cg/Affiliation ;; Can keep, but need to sort out the relationships with Agents, etc
-    {:properties
+    {:dc/description "A ClinGen affiliation (such as a Gene Curation Expert Panel) is one of the groups responsible for producing ClinGen expert knowledge."
+     :properties
      []}
     :cg/Finding
-    {:properties
+    {:dc/description "A specific result, observation, or conclusion that emerges from systematic research or experimentation. It represents new knowledge or evidence discovered through the scientific process."
+     :properties
      [:cg/demonstrates :cg/method :cg/statisticalSignificanceType :cg/statisticalSignificanceValue :cg/caseCohort :cg/controlCohort :cg/statisticalSignificanceValueType :cg/lowerConfidenceLimit :cg/upperConfidenceLimit :cg/pValue]}
     :cg/FamilyCosegregation
-    {:properties
+    {:dc/description
+     "Analysis of how genetic variants are inherited together within families to assess pathogenicity."
+     :properties
      [:cg/phenotype :cg/phenotypePositiveAllelePositive :cg/family :cg/proband :cg/meetsInclusionCriteria :cg/estimatedLodScore :cg/phenotypeFreeText :cg/publishedLodScore :cg/SequencingMethod :dc/description :cg/phenotypeNegativeAlleleNegative :cg/sequencingMethod]}
     :cg/Family
-    {:properties
+    {:dc/description "A group of biologically related individuals who share genetic material and are studied together to understand inheritance patterns, genetic disease transmission, or trait heritability."
+     :properties
      [:cg/member :cg/ethnicity :cg/modeOfInheritance]}
     :cg/Cohort
-    {:properties
+    {:dc/description "A defined group of individuals who are followed over time to investigate the relationship between genetic factors and health outcomes or traits."
+     :properties
      [:cg/evidence :cg/detectionMethod :cg/allGenotypedSequenced :cg/numWithVariant :cg/alleleFrequency :cg/relatedCondition]}
     :cg/VariantFunctionalImpactEvidence
-    {:properties
+    {:dc/description "Data demonstrating how a genetic variant affects biological function."
+     :properties
      [:cg/functionalDataSupport]
      :cg/note "Find out what is going on with functionalDataSupport"}
     :so/SequenceFeature
-    {:properties
+    {:dc/description "Any extent of continuous biological sequence."
+     :properties
      [:ga4gh/definingLocation :ga4gh/location :owl/sameAs :skos/prefLabel :skos/altLabel :so/ChromosomeBand :skos/hiddenLabel]}
     :dc/BibliographicResource
-    {:properties
+    {:dc/description "A book, article, or other documentary resource."
+     :properties
      [:dc/creator :dc/title :dc/date :dc/abstract :cg/about]}
     ;; [:ga4gh/CanonicalLocation nil] ; need, but need to think about
     ;; [:ga4gh/SequenceLocation nil] ; need -- incorporate from ga4gh schema
@@ -100,8 +117,10 @@
    :properties
    {:rdfs/label {:type 'String}
     :rdf/type {:type (list :owl/Class)}
-    :dc/description {:type 'String}
-    :dc/source {:type :rdfs/Resource}
+    :dc/description {:dc/description "An account of the resource."
+                     :type 'String}
+    :dc/source {:dc/description "A related resource from which the described resource is derived."
+                :type :rdfs/Resource}
     :skos/inScheme {:type (list :cg/ValueSet)}
     :skos/member {:type (list :rdfs/Resource)}
     :rdfs/subClassOf {:type (list :owl/Class)}
@@ -110,7 +129,9 @@
     :cg/annotations {:type (list :cg/AssertionAnnotation)}
     :cg/evidenceStrength {:type :owl/Class} ;; TODO or skos/concept?
     :cg/contributions {:type (list :cg/Contribution)}
-    :dc/date {:type 'String}
+    :dc/date {:dc/description
+   "A point or period of time associated with an event in the lifecycle of the resource."
+              :type 'String}
     :cg/agent {:type :cg/Agent}
     :cg/role {:type :owl/Class}
     :cg/feature {:type :so/SequenceFeature}
@@ -119,7 +140,8 @@
     :cg/variant {:type :cg/CanonicalVariant}
     :cg/pValue {:type 'Float}
     :cg/classification {:type :owl/Class}
-    :dc/creator {:type :cg/Agent}
+    :dc/creator {:dc/description "An entity responsible for making the resource."
+                 :type :cg/Agent}
     :cg/functionalDataSupport {} ;; investigate
     :cg/about {:type :rdfs/Resource}
     :cg/method {:type :owl/Class}
@@ -137,10 +159,12 @@
     :cg/upperConfidenceLimit {}           ; investigate
     :cg/member {:type (list :cg/Proband)} ; update to family member?
     :cg/disease {:type :owl/Class}
-    :dc/abstract {:type 'String}
+    :dc/abstract {:dc/description "A summary of the resource."
+                  :type 'String}
     :cg/statisticalSignificanceValueType {} ;;investigate
     :cg/evidence {:type (list :rdfs/Resource)}
-    :dc/title {:type 'String}
+    :dc/title {:dc/description "A name given to the resource."
+               :type 'String}
     :cg/ethnicity {:type :owl/Class}
     :cg/sequencingMethod {:type :owl/Class}
     :cg/meetsInclusionCriteria {}           ; boolean?

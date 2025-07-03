@@ -46,7 +46,7 @@
        {:class "py-4"}
        [:a
         {:href (term-href k)}
-        (str k)]])]])
+        k]])]])
 
 (defn documentation []
   [:div

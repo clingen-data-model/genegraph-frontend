@@ -28,13 +28,55 @@
      [:h2
       {:class
        "text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl"}
+      "Genegraph:"
       [:span
        {:class "text-sky-700"}
-       "Genegraph:"]
-      " computable ClinGen evidence"]
+       " computable "]
+       "ClinGen gene evidence"]
      [:p
       {:class "mt-6 text-lg/8 text-gray-600"}
-      "Download the complete ClinGen Gene Validity data set, including the full curation history, as well as rich, detailed evidence. Leverages the SEPIO and GA4GH GKS data models."]]
+      "Genegraph transforms the Gene Validity curations performed by ClinGen Gene Curation Expert Panels using the "
+      [:a {:href "https://curation.clinicalgenome.org"
+           :class "font-semibold text-sky-500"
+           :target "_blank"}
+       "Gene Curation Interface"]
+      " into a standardized, computable form, "
+      " leveraging the "
+      [:a
+       {:href "https://github.com/monarch-initiative/SEPIO-ontology"
+        :class "font-semibold text-sky-500"
+        :target "_blank"}
+       "SEPIO"]
+      " and "
+      [:a
+       {:href "https://www.ga4gh.org/work_stream/genomic-knowledge-standards/"
+        :class "font-semibold text-sky-500"
+        :target "_blank"}
+       "GA4GH GKS"]
+      " data models."]
+     [:p
+      {:class "mt-6 text-lg/8 text-gray-600"}
+      "Download the complete ClinGen Gene Validity data set, including the full curation history, with detailed and structured evidence "
+      [:a
+       {:href (rfe/href :routes/downloads)
+        :class "font-semibold text-sky-500"}
+       "here."]]
+     [:p
+      {:class "mt-6 text-sm/6 text-gray-500"}
+      "When using this data please cite: "
+      [:a
+       {:href "https://pubmed.ncbi.nlm.nih.gov/38663031/"
+        :target "_blank"}
+       "Wright MW, Thaxton CL, Nelson T, et al."
+       [:span
+        {:class "font-semibold"}
+        " Generating Clinical-Grade Gene-Disease Validity Classifications Through the ClinGen Data Platforms."]
+       [:span
+        {:class "italic"}
+        " Annu Rev Biomed Data Sci."]
+       [:span
+        {:class "text-xs"}
+        " 2024;7(1):31-50. doi:10.1146/annurev-biodatasci-102423-112456"]]]] 
     [:div
      {:class "mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none"}
      [:dl
