@@ -56,7 +56,7 @@
       " data models."]
      [:p
       {:class "mt-6 text-lg/8 text-gray-600"}
-      "Download the complete ClinGen Gene Validity data set, including the full curation history, with detailed and structured evidence "
+      "Download the complete ClinGen Gene Validity data set, including full evidence and history, "
       [:a
        {:href (rfe/href :routes/downloads)
         :class "font-semibold text-sky-500"}
