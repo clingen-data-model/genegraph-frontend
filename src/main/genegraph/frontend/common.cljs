@@ -1,7 +1,17 @@
 (ns genegraph.frontend.common
   "Common display elements that do not belong to a specific page, component, or namespace, but can be used by all."
   (:require [clojure.string :as s]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [reitit.frontend.easy :as rfe]))
+
+(rf/reg-event-db
+ ::set-target-object
+ (fn [db [_ target]]
+   (assoc db ::target-object target)))
+
+(defn resource-href [resource]
+  (rfe/href :routes/resource
+            {:id (:curie resource)}))
 
 (defn kw->iri-id [k]
   (-> k str (s/replace #":" "") (s/replace #"/" "_")))

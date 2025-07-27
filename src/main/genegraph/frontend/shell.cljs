@@ -20,6 +20,11 @@
  ::secondary-view
  :-> :secondary-view)
 
+(rf/reg-sub
+ ::search-active?
+ (fn [db _]
+   (< 0 (count (::search/search-input db)))))
+
 ;; Part of pre-existing template
 ;; Not currently designed or used
 (comment
@@ -241,11 +246,6 @@
        (for [s sections]
          (sidebar-section s current-route))]]]))
 
-(rf/reg-event-db
- ::update-search-input
- (fn [db [_ value]]
-   (assoc db ::search/search-input value)))
-
 (defn search-form []
   [:form
    {:class "grid flex-1 grid-cols-1 my-1"
@@ -260,7 +260,7 @@
      :aria-label "Search",
      :class "col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6 border-none focus:ring-1 rounded-full",
      :placeholder "Search"
-     :on-change #(rf/dispatch [::update-search-input (-> % .-target .-value)])
+     :on-change #(rf/dispatch [::search/update-search-input (-> % .-target .-value)])
      :on-key-down (fn [e]
                     (case (.-key e)
                       "Enter" (rf/dispatch
@@ -422,21 +422,24 @@
    (profile-dropdown)])
 
 (defn shell []
-  [:div
-   #_(mobile-menu)
-   (sidebar)
-   [:div
-    {:class "lg:pl-20"}
+  (let [search-active @(rf/subscribe [::search-active?])]
     [:div
-     {:class
-      "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"}
-     #_(open-sidebar-button)
-     (comment "Separator")
+     #_(mobile-menu)
+     (sidebar)
      [:div
-      {:class "h-6 w-px bg-gray-900/10 lg:hidden", :aria-hidden "true"}]
-     [:div
-      {:class "flex flex-1 gap-x-4 self-stretch lg:gap-x-6 bg-white"}
-      (search-form)
-      #_(profile)]]
-    (main)]
-   (secondary)])
+      {:class "lg:pl-20"}
+      [:div
+       {:class
+        "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"}
+       #_(open-sidebar-button)
+       (comment "Separator")
+       [:div
+        {:class "h-6 w-px bg-gray-900/10 lg:hidden", :aria-hidden "true"}]
+       [:div
+        {:class "flex flex-1 gap-x-4 self-stretch lg:gap-x-6 bg-white"}
+        (search-form)
+        #_(profile)]]
+      (if search-active
+        (search/search-result-div)
+        (main))]
+     (secondary)]))

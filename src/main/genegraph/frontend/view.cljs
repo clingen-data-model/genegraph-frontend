@@ -32,8 +32,6 @@
 
 (defn render-component [component-def]
   (case (:component component-def)
-    :search-dialog (search/search-div)
-    :search-result (search/search-result-div)
     :assertion (assertion/assertion-detail-div component-def)))
 
 #_[:pre (with-out-str (cljs.pprint/pprint stack))]

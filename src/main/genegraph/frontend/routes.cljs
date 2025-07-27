@@ -146,10 +146,11 @@
        :parameters {:path [:id]}
        :start (fn [params]
                 (re-frame/dispatch
-                 [::resource-page/set-current-resource
-                  #_params
+                 [::resource-page/nav-to
+
                   (get-in params [:path :id])])
-                (js/console.log "Entering resource page"))
+                (js/console.log "Entering resource page "
+                                (get-in params [:path :id])))
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving resource page"))}]}]
