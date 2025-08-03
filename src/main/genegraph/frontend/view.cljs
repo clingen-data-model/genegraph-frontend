@@ -3,7 +3,6 @@
               [re-graph.core :as re-graph]
               [reitit.frontend.easy :as rfe]
               [genegraph.frontend.user :as user]
-              [genegraph.frontend.queries :as queries]
               [genegraph.frontend.icon :as icon]
               [genegraph.frontend.components.search :as search]
               [genegraph.frontend.components.resource :as resource]

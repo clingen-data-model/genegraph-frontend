@@ -1,0 +1,63 @@
+query ($iri: String) {
+  resource(iri: $iri) {
+    __typename
+    iri
+    curie
+    label
+    type {
+      curie
+      label
+    }
+    ...SequenceFeature3
+  }
+}
+
+fragment GeneValidityProposition1 on GeneValidityProposition {
+  modeOfInheritance {
+    curie
+    label
+  }
+  disease {
+    curie
+    label
+  }
+}
+
+fragment GeneticConditionMechanismProposition1 on GeneticConditionMechanismProposition {
+  mechanism {
+    curie
+  }
+  condition {
+    label
+    curie
+  }
+}
+
+fragment SequenceFeature3 on SequenceFeature {
+  assertions {
+    curie
+    iri
+    evidenceStrength {
+      curie
+    }
+    subject {
+      __typename
+      type {
+        curie
+        label
+      }
+      ...GeneValidityProposition1
+      ...GeneticConditionMechanismProposition1
+    }
+    contributions {
+      role {
+        curie
+      }
+      date
+      agent {
+        curie
+        label
+      }
+    }
+  }
+}

@@ -31,9 +31,20 @@
 (rf/reg-event-db
  ::recieve-result
  (fn [db [_ result]]
-   (assoc db
-          ::result
-          (get-in result [:response :data :textSearch]))))
+   (let [resources (get-in result [:response :data :textSearch])]
+     (reduce
+      (fn [m r]
+        (js/console.log (:curie r))
+        (update m
+                  (:curie r)
+                  common/inc-detail
+
+                (assoc r ::common/detail-level 0))
+        #_(assoc m
+               (:curie r)
+               (assoc r ::common/detail-level 0)))
+      (assoc db ::result resources)
+      resources))))
 
 (rf/reg-event-fx
  ::update-search-input
@@ -66,26 +77,34 @@
  ::result
  :-> ::result)
 
+(rf/reg-sub
+ ::resource
+ (fn [db curie]
+   (if (nil? curie)
+     "nil!"
+     curie)))
+
 (defn search-result-div []
   (let [result @(rf/subscribe [::result])]
     [:ul
      {:role "list", :class "divide-y divide-gray-100 px-12 pt-8"}
-     (for [r result]
-       ^{:key r}
-       [:li
-        {:class "flex items-center justify-between gap-x-6 py-5"}
-        [:div
-         {:class "min-w-0"}
+     (doall
+      (for [r result]
+        ^{:key r}
+        [:li
+         {:class "flex items-center justify-between gap-x-6 py-5"}
          [:div
-          {:class "flex items-start gap-x-3"}
-          [:a
-           {:class "text-sm/6 font-semibold text-gray-900"
-            :href (common/resource-href r)
-            :on-click #(rf/dispatch [::reset-search])}
-           (:label r)]
-          (for [t (:type r)]
-            ^{:key [r t]}
-            [:p
-             {:class
-              "mt-0.5 rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-green-700 ring-1 ring-green-600/20 ring-inset"}
-             (:label t)])]]])]))
+          {:class "min-w-0"}
+          [:div
+           {:class "flex items-start gap-x-3"}
+           [:a
+            {:class "text-sm/6 font-semibold text-gray-900"
+             :href (common/resource-href r)
+             :on-click #(rf/dispatch [::reset-search])}
+            (:label r)]
+           (for [t (:type r)]
+             ^{:key [r t]}
+             [:p
+              {:class
+               "mt-0.5 rounded-md bg-green-50 px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-green-700 ring-1 ring-green-600/20 ring-inset"}
+              (:label t)])]]]))]))

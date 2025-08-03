@@ -4,6 +4,16 @@
             [re-frame.core :as rf]
             [reitit.frontend.easy :as rfe]))
 
+(defn inc-detail [old new]
+  (if (and old (< (::detail-level new) (::detail-level old)))
+    old
+    new))
+
+(rf/reg-sub
+ :resource
+ (fn [db [_ curie]]
+   (get db curie)))
+
 (rf/reg-event-db
  ::set-target-object
  (fn [db [_ target]]

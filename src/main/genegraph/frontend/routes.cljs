@@ -147,7 +147,6 @@
        :start (fn [params]
                 (re-frame/dispatch
                  [::resource-page/nav-to
-
                   (get-in params [:path :id])])
                 (js/console.log "Entering resource page "
                                 (get-in params [:path :id])))

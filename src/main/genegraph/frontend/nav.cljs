@@ -1,9 +1,11 @@
 (ns genegraph.frontend.nav
+  "DEPRECATED
+  Old nav for ClinGen filter-based queries. Left as example for now"
   (:require [re-frame.core :as re-frame]
             [re-graph.core :as re-graph]
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.user :as user]
-            [genegraph.frontend.queries :as queries]
+            [genegraph.frontend.filters :as queries] ;; Refactor at some point
             [genegraph.frontend.icon :as icon]))
 
 (re-frame/reg-event-db
