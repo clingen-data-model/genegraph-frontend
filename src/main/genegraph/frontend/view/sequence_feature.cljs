@@ -85,7 +85,7 @@
         [:div
          {:class "pr-4"}
          [:a
-          {:href "#"}
+          {:href (common/resource-href assertion)}
           [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
           (str/replace 
            (or (:label condition)
@@ -99,7 +99,7 @@
        [:p
         {:class "mt-1 flex text-xs/5 text-gray-500"}
         [:a
-         {:href "#",
+         {:href (common/resource-href assertion)
           :class "relative truncate hover:underline"}
          (get-in assertion [:subject :mechanism :curie])]]]]
      (approval-div approval)]))
@@ -135,7 +135,7 @@
         [:div
          {:class "pr-4"}
          [:a
-          {:href "#"}
+          {:href (common/resource-href assertion)}
           [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
           (str/replace 
            (or (:label disease)
@@ -149,7 +149,7 @@
        [:p
         {:class "mt-1 flex text-xs/5 text-gray-500"}
         [:a
-         {:href "#",
+         {:href (common/resource-href assertion)
           :class "relative truncate hover:underline"}
          (get-in assertion [:subject :modeOfInheritance :label])]]]]
      (approval-div approval)]))

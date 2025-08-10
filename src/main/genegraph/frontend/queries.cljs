@@ -35,6 +35,39 @@
 }"
        :dependencies #{{:typename "GeneValidityProposition" :detail-level  1}
                        {:typename "GeneticConditionMechanismProposition" :detail-level  1}}}}
+   "EvidenceStrengthAssertion"
+   {3 {:fragment "{
+    curie
+    iri
+    evidenceStrength {
+      curie
+    }
+    versions {
+    ...Resource1
+    }
+    subject {
+      __typename
+      type {
+        curie
+        label
+      }
+      ...GeneValidityProposition1
+      ...GeneticConditionMechanismProposition1
+    }
+    contributions {
+      role {
+        curie
+      }
+      date
+      agent {
+        curie
+        label
+      }
+    }
+  }"
+       :dependencies #{{:typename "GeneValidityProposition" :detail-level  1}
+                       {:typename "Resource" :detail-level  1}
+                       {:typename "GeneticConditionMechanismProposition" :detail-level  1}}}}
    "GeneValidityProposition"
    {1 {:fragment "{
   modeOfInheritance {
@@ -42,6 +75,10 @@
     label
   }
   disease {
+    curie
+    label
+  }
+  gene {
     curie
     label
   }
@@ -83,6 +120,7 @@
   resource(iri: $iri) {
     ...Resource1
     ...SequenceFeature3
+    ...EvidenceStrengthAssertion3
   }
 }")
 
@@ -120,4 +158,6 @@
 
 (def compiled-base-query
   (compile-query base-resource-query))
+
+(println compiled-base-query)
 

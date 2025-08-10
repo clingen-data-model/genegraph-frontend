@@ -4,10 +4,12 @@
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.icon :as icon]
             [genegraph.frontend.common :as common]
+            [genegraph.frontend.queries :as queries]
             [genegraph.frontend.display.features :as features]
             [genegraph.frontend.components.search :as search]
             [clojure.string :as s]
-            [genegraph.frontend.view.sequence-feature]))
+            [genegraph.frontend.view.sequence-feature]
+            [genegraph.frontend.view.assertion]))
 
 
 
@@ -441,5 +443,6 @@
         #_(profile)]]
       (if search-active
         (search/search-result-div)
-        (main))]
+        (main))
+      #_[:pre (with-out-str (cljs.pprint/pprint queries/compiled-base-query))]]
      (secondary)]))
