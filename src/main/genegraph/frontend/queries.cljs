@@ -35,15 +35,44 @@
 }"
        :dependencies #{{:typename "GeneValidityProposition" :detail-level  1}
                        {:typename "GeneticConditionMechanismProposition" :detail-level  1}}}}
+   "EvidenceLine"
+   {2 {:fragment "{
+     ...Resource1
+      strengthScore
+      specifiedBy {
+        curie
+      }
+      evidenceStrength {
+        curie
+      }
+      evidence {
+        curie
+      }
+    }"
+       :dependencies
+       #{{:typename "Resource" :detail-level 1}}}}
    "EvidenceStrengthAssertion"
    {3 {:fragment "{
-    curie
-    iri
-    evidenceStrength {
+    version
+    description
+    curationReasons {
       curie
     }
+    specifiedBy {
+      curie
+      label
+    }
+    curationReasonDescription
+    evidenceStrength {
+      curie
+      label
+    }
+    strengthScore
+    evidence {
+      ...EvidenceLine2
+    }
     versions {
-    ...Resource1
+    ...EvidenceStrengthAssertion2
     }
     subject {
       __typename
@@ -65,8 +94,48 @@
       }
     }
   }"
+       :dependencies #{{:typename "GeneValidityProposition"
+                        :detail-level  1}
+                       {:typename "EvidenceLine"
+                        :detail-level 2}
+                       {:typename "Resource"
+                        :detail-level  1}
+                       {:typename "EvidenceStrengthAssertion"
+                        :detail-level 2}
+                       {:typename "GeneticConditionMechanismProposition"
+                        :detail-level  1}}}
+    2 {:fragment "{
+    version
+    evidenceStrength {
+      curie
+      label
+    }
+    curationReasons {
+      curie
+      label
+    }
+    curationReasonDescription
+    subject {
+      __typename
+      type {
+        curie
+        label
+      }
+      ...GeneValidityProposition1
+      ...GeneticConditionMechanismProposition1
+    }
+    contributions {
+      role {
+        curie
+      }
+      date
+      agent {
+        curie
+        label
+      }
+    }
+  }"
        :dependencies #{{:typename "GeneValidityProposition" :detail-level  1}
-                       {:typename "Resource" :detail-level  1}
                        {:typename "GeneticConditionMechanismProposition" :detail-level  1}}}}
    "GeneValidityProposition"
    {1 {:fragment "{
