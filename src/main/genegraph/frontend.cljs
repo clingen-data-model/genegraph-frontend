@@ -20,6 +20,9 @@
 
 (goog-define BACKEND_WS "ws://localhost:8888/ws")
 (goog-define BACKEND_HTTP "http://localhost:8888/api")
+(goog-define ENV "dev")
+
+(js/console.log (str ENV))
 
 (defonce match (reagent/atom nil))
 
@@ -71,11 +74,12 @@
        [view @match]))
    [:pre @match]])
 
-(re-frame/reg-event-db ::initialize-db
-  (fn [db _]
-    (if db
-      db
-      {:current-route nil})))
+(re-frame/reg-event-db
+ ::initialize-db
+ (fn [db _]
+   (if db
+     db
+     {:current-route nil})))
 
 (defn ^:dev/after-load render-root []
   (println "[main] reloaded lib:")

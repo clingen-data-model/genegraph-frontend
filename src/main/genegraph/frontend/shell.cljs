@@ -9,7 +9,8 @@
             [genegraph.frontend.components.search :as search]
             [clojure.string :as s]
             [genegraph.frontend.view.sequence-feature]
-            [genegraph.frontend.view.assertion]))
+            [genegraph.frontend.view.assertion]
+            [genegraph.frontend.auth :as auth]))
 
 
 
@@ -211,7 +212,12 @@
    {:route :routes/documentation
     :name "Documentation"
     :icon icon/book-open
-    :active-on #{:routes/documentation :routes/documentation-term}}])
+    :active-on #{:routes/documentation :routes/documentation-term}}
+   {:route :routes/filter
+    :name "Filter"
+    :icon icon/filter-icon
+    :requires-authentication true
+    :active-on #{:routes/filter}}])
 
     (comment
         "Current: \"bg-gray-800 text-white\", Default: \"text-gray-400 hover:text-white hover:bg-gray-800\"")
@@ -227,6 +233,11 @@
        "group flex gap-x-3 rounded-md p-3 text-sm/6 font-semibold text-sky-400 hover:bg-sky-700 hover:text-sky-100")}
     (:icon section)
     [:span {:class "sr-only"} (:name section)]]])
+
+(defn current-sections []
+  (if @(rf/subscribe [::auth/current-user])
+    sections
+    (remove :requires-authentication sections)))
 
 (defn sidebar []
   (let [current-route @(rf/subscribe [:genegraph.frontend.routes/current-route])]
@@ -245,7 +256,7 @@
       {:class "mt-8"}
       [:ul
        {:role "list", :class "flex flex-col items-center space-y-1"}
-       (for [s sections]
+       (for [s (current-sections)]
          (sidebar-section s current-route))]]]))
 
 (defn search-form []
@@ -424,7 +435,8 @@
    (profile-dropdown)])
 
 (defn shell []
-  (let [search-active @(rf/subscribe [::search-active?])]
+  (let [search-active @(rf/subscribe [::search-active?])
+        current-user @(rf/subscribe [::auth/current-user])]
     [:div
      #_(mobile-menu)
      (sidebar)
@@ -439,7 +451,9 @@
         {:class "h-6 w-px bg-gray-900/10 lg:hidden", :aria-hidden "true"}]
        [:div
         {:class "flex flex-1 gap-x-4 self-stretch lg:gap-x-6 bg-white"}
-        (search-form)
+        (if current-user
+          (search-form)
+          [:div])
         #_(profile)]]
       (if search-active
         (search/search-result-div)

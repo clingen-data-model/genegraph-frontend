@@ -117,6 +117,107 @@
         (mechanism-assertion a))]]
     nil))
 
+(defn overlapping-feature [feature]
+  ^{:key (:curie feature)}
+  [:li
+   {:class
+    "relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6"}
+   [:div
+    {:class "flex min-w-0 gap-x-4"}
+    [:div
+     {:class "min-w-0 flex-auto"}
+     [:div
+      {:class "text-sm/6 font-semibold text-gray-900 flex"}
+      [:div
+       {:class "pr-4"}
+       [:a
+        {:href (common/resource-href feature)}
+        [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
+        (:label feature)]]
+      #_[:span
+       {:class
+        "inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600"}
+         (count (:assertions feature))]]
+     [:p
+      {:class "mt-1 flex text-xs/5 text-gray-500"}
+      [:a
+       {#_#_:href (common/resource-href assertion)
+        :class "relative truncate hover:underline"}
+       [:span (count (:assertions feature)) " assertions"]
+       #_(get-in assertion [:subject :mechanism :curie])]]]]
+   #_(approval-div approval)])
+
+(defn overlapping-features [features]
+  (if (seq features)
+    [:div
+     {:class "overflow-hidden rounded-md bg-white shadow-sm"}
+     [:div
+      {:class "border-b border-gray-200 bg-white px-4 py-5 sm:px-6"}
+      [:h3 {:class "text-base font-semibold text-gray-900"} "Overlapping Features"]]
+     [:ul
+      {:role "list", :class "divide-y divide-gray-200"}
+      (for [f (->> features
+                   (sort-by #(count (:assertions %)))
+                   reverse)]
+        (overlapping-feature f))]]
+    nil))
+
+
+(defn overlapping-variant [variant]
+  ^{:key (:curie variant)}
+  [:li
+   {:class
+    "relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6"}
+   [:div
+    {:class "flex min-w-0 gap-x-4"}
+    [:div
+     {:class "min-w-0 flex-auto"}
+     [:div
+      {:class "text-sm/6 font-semibold text-gray-900 flex"}
+      [:div
+       {:class "pr-4"}
+       [:a
+        {:href (:iri variant)
+         :target "_blank"}
+        [:span {:class "absolute inset-x-0 -top-px bottom-0"}]
+        (:label variant)]]
+      #_[:span
+         {:class
+          "inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600"}
+         (count (:assertions feature))]]
+     #_[:p
+        {:class "mt-1 flex text-xs/5 text-gray-500"}
+        [:a
+         {:href (common/resource-href assertion)
+          :class "relative truncate hover:underline"}
+         [:span (count (:assertions feature)) " assertions"]
+         (get-in assertion [:subject :mechanism :curie])]]]]
+   #_(approval-div (-> assertion :contributions first))
+   (for [a (:assertions variant)]
+     ^{:key a}
+     [:div (get-in a [:classification :curie])])])
+
+(defn counts-div [variants]
+  (let [counts (->> variants
+                    (mapcat :assertions)
+                    (map #(get-in % [:classification :curie]))
+                    frequencies)]
+    [:pre (with-out-str (cljs.pprint/pprint counts))]))
+
+(defn overlapping-variants [label variants]
+  (if (seq variants)
+    [:div
+     {:class "overflow-hidden rounded-md bg-white shadow-sm"}
+     [:div
+      {:class "border-b border-gray-200 bg-white px-4 py-5 sm:px-6 flex items-center justify-between"}
+      [:h3 {:class "text-base font-semibold text-gray-900"}
+       label]
+      (counts-div variants)]
+     [:ul
+      {:role "list", :class "divide-y divide-gray-200"}
+      (for [v variants]
+        (overlapping-variant v))]]
+    nil))
 
 ;; TODO maybe lighter gray for classifications
 (defn validity-assertion [assertion]
@@ -174,7 +275,9 @@
 
 (defmethod common/main-view "SequenceFeature" [feature]
   (let [grouped-assertions (group-by #(get-in % [:subject :__typename])
-                                     (:assertions feature))]
+                                     (:assertions feature))
+        grouped-variants (group-by #(get-in % [:copyChange :curie])
+                                   (:overlappingVariants feature))]
     [:div
      {:class "flex flex-col gap-6"}
      (feature-title feature)
@@ -182,4 +285,11 @@
      (mechanism-assertions (get grouped-assertions
                                 "GeneticConditionMechanismProposition"))
      (validity-assertions (get grouped-assertions
-                               "GeneValidityProposition"))]))
+                               "GeneValidityProposition"))
+     (overlapping-features (:overlappingFeatures feature))
+     (overlapping-variants "Overlapping Copy Number Loss"
+                           (get grouped-variants "EFO:0030067"))
+     (overlapping-variants "Overlapping Copy Number Gain"
+                           (get grouped-variants "EFO:0030070"))
+     [:div
+      [:pre (with-out-str (cljs.pprint/pprint feature))]]]))

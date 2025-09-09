@@ -14,6 +14,8 @@
             [genegraph.frontend.page.gencc-list :as gencc-list]
             [genegraph.frontend.page.annotations :as annotations]
             [genegraph.frontend.page.conflict-list :as conflict-list]
+            [genegraph.frontend.page.filter :as filter-page]
+            [genegraph.frontend.filters :as filters-query]
             [genegraph.frontend.view :as view]
             [genegraph.frontend.components.search :as search]
             [genegraph.frontend.components.resource :as resource]
@@ -153,6 +155,20 @@
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving resource page"))}]}]
+   ["filter"
+    {:name      :routes/filter
+     :view      filter-page/filter-div
+     :link-text "Filter"
+     :controllers
+     [{ ;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering filter page")
+                #_(re-frame/dispatch [::filters-query/clear-query-result])
+                #_(re-frame/dispatch [::home/request-conflict-list]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving filter page"))}]}]
    ["gencc-home"
     {:name      :routes/gencc-home
      :view      gencc-home/home

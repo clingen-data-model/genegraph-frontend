@@ -16,5 +16,7 @@
   {:target :browser
    :modules {:main {:init-fn genegraph.frontend/init}}
    :release {:closure-defines {genegraph.frontend.BACKEND_WS "wss://genegraph.clinicalgenome.org/ws"
-                               genegraph.frontend.BACKEND_HTTP "https://genegraph.clinicalgenome.org/api"}}
+                               genegraph.frontend.BACKEND_HTTP "https://genegraph.clinicalgenome.org/api"
+                               genegraph.frontend.ENV
+                               "prod"}}
    :devtools {:reload-strategy :full}}}}

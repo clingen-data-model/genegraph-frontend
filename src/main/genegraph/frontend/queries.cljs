@@ -4,8 +4,61 @@
 
 
 (def fragments
-  {"SequenceFeature"
+  {"CanonicalVariant"
+   {2 {:fragment "{
+    copyChange {
+     curie
+    }
+    assertions {
+      ...Resource1
+      ...EvidenceStrengthAssertion1
+    }
+}"}}
+   "SequenceFeature"
    {3 {:fragment "{
+  overlappingFeatures {
+    ...Resource1
+    ...SequenceFeature1
+  }
+  overlappingVariants(overlap_kind: \"equal\") {
+    ...Resource1
+    ...CanonicalVariant2
+  }
+  assertions {
+    curie
+    iri
+    evidenceStrength {
+      curie
+    }
+    subject {
+      __typename
+      type {
+        curie
+        label
+      }
+      ...GeneValidityProposition1
+      ...GeneticConditionMechanismProposition1
+    }
+    contributions {
+      role {
+        curie
+      }
+      date
+      agent {
+        curie
+        label
+      }
+    }
+  }
+}"
+       :dependencies
+       #{{:typename "GeneValidityProposition" :detail-level  1}
+         {:typename "GeneticConditionMechanismProposition" :detail-level  1}
+         {:typename "SequenceFeature" :detail-level  1}
+         {:typename "Resource" :detail-level  1}
+         {:typename "CanonicalVariant" :detail-level 2}
+         {:typename "EvidenceStrengthAssertion" :detail-level 1}}}
+    1 {:fragment "{
   assertions {
     curie
     iri
@@ -35,6 +88,7 @@
 }"
        :dependencies #{{:typename "GeneValidityProposition" :detail-level  1}
                        {:typename "GeneticConditionMechanismProposition" :detail-level  1}}}}
+   
    "EvidenceLine"
    {2 {:fragment "{
      ...Resource1
@@ -82,6 +136,7 @@
       }
       ...GeneValidityProposition1
       ...GeneticConditionMechanismProposition1
+      ...VariantPathogenicityProposition1
     }
     contributions {
       role {
@@ -95,6 +150,8 @@
     }
   }"
        :dependencies #{{:typename "GeneValidityProposition"
+                        :detail-level  1}
+                       {:typename "VariantPathogenicityProposition"
                         :detail-level  1}
                        {:typename "EvidenceLine"
                         :detail-level 2}
@@ -135,8 +192,15 @@
       }
     }
   }"
-       :dependencies #{{:typename "GeneValidityProposition" :detail-level  1}
-                       {:typename "GeneticConditionMechanismProposition" :detail-level  1}}}}
+       :dependencies #{{:typename "GeneValidityProposition"
+                        :detail-level  1}
+                       {:typename "GeneticConditionMechanismProposition"
+                        :detail-level  1}}}
+    1 {:fragment "{
+    classification {
+      curie
+    }
+}"}}
    "GeneValidityProposition"
    {1 {:fragment "{
   modeOfInheritance {
@@ -161,6 +225,13 @@
     label
     curie
   }
+}"}}
+   "VariantPathogenicityProposition"
+   {1 {:fragment "{
+        variant {
+          iri
+          label
+        }
 }"}}
    "Resource"
    {1 {:fragment "{

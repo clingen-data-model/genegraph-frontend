@@ -1,11 +1,12 @@
 (ns genegraph.frontend.filters
   (:require [re-frame.core :as re-frame]
-            [re-graph.core :as re-graph]))
+            [re-graph.core :as re-graph]
+            [genegraph.frontend.queries :as queries]))
 
 ;; These are the filters used to narrow down the set of 
 
 (def graphql-query
-  "
+  (queries/compile-query  "
 query ($filters: [Filter]) {
   assertions(filters: $filters) {
     __typename
@@ -31,21 +32,14 @@ query ($filters: [Filter]) {
       date
     }
     subject {
-      __typename
-      iri
-      ... on VariantPathogenicityProposition {
-        curie
-        variant {
-          iri
-          label
-        }
-      }
+      ...Resource1
+      ...VariantPathogenicityProposition1
     }
   }
 }
-"
-  )
-
+"))
+(println graphql-query) 
+ 
 (re-frame/reg-event-fx
  ::send-query
  (fn [{:keys [db]} [_ filters]]
@@ -67,6 +61,13 @@ query ($filters: [Filter]) {
                   [:response
                    :data
                    :assertions]))))
+
+
+(re-frame/reg-event-db
+ ::clear-query-result
+ (fn [db _]
+   (js/console.log "cleared result")
+   (dissoc db ::query-result)))
 
 (re-frame/reg-sub
  ::query-result
@@ -131,7 +132,7 @@ query ($filters: [Filter]) {
                :argument "CG:Genes35"
                :operation "not_exists"}]}
    {:label "Deletions with partial overlap of HI genes"
-    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as Haploinsufficenty genes in the ClinGen Dosage map. Excluding variants that could be classified as pathogenic for another reason."
+    :description "Copy Number Loss variants in ClinVar that have a partial overlap with a gene classified as Haploinsufficency genes in the ClinGen Dosage map. Excluding variants that could be classified as pathogenic for another reason."
     :filters [{:filter :proposition_type
                :argument "CG:VariantPathogenicityProposition"}
               {:filter :copy_change
@@ -216,6 +217,36 @@ query ($filters: [Filter]) {
     :filters [{:filter :proposition_type
                :argument "CG:VariantPathogenicityProposition"}
               {:filter :has_annotation}]}
+   {:label "Candidate Gold Standard"
+    :description "Variants that are not pathogenic due to the gene dosage map but are called as pathogenic in ClinVar. Must be newer than 2020"
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :copy_change
+               :argument "EFO:0030067"}
+              {:filter :partial_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:HaploinsufficiencyFeatures"
+               :operation "not_exists"}
+              {:filter :gene_count_min
+               :argument "CG:Genes35"
+               :operation "not_exists"}
+              {:filter :assertion_direction
+               :argument "CG:Supports"}
+              {:filter :submitter
+               :argument "CVAGENT:500031"
+               :operation "not_exists"}
+              {:filter :date_evaluated_min
+               :argument "2020"}
+              {:filter :complete_overlap_with_feature_set
+               :argument "CG:ProteinCodingGenes"}]}
+   {:label "From Invitae"
+    :description "Assertions that have been annotated by curators."
+    :filters [{:filter :proposition_type
+               :argument "CG:VariantPathogenicityProposition"}
+              {:filter :from_agent
+               :argument "CVAGENT:500031"}]}
    #_{:label "Other annotated assertions"
       :description "Assertions that have been annotated by curators, without making an assessment about the quality of the submission or the "
       :filters [{:filter :proposition_type
