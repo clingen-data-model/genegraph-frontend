@@ -1,4 +1,17 @@
-(ns genegraph.schema)
+(ns genegraph.schema
+  (:require [reitit.frontend.easy :as rfe]
+            [genegraph.frontend.common :as common]))
+
+;; copied from genegraph.frontend.page.documentation
+;; need to decide on appropriate place for this to live
+(defn term-href [term]
+  (rfe/href :routes/documentation-term {:id (common/kw->iri-id term)}))
+
+(defn entity [e]
+  [:a
+   {:href (term-href e)
+    :class "font-medium text-sky-700"}
+   e])
 
 (def schema
   {:interfaces
@@ -29,8 +42,66 @@
     :cg/EvidenceStrengthAssertion
     {:rdfs/label "Evidence Strength Assertion"
      :dc/description "An assertion of the strength of evidence supporting a given proposition."
+     :markup
+     [:div
+      {:class "flex flex-col gap-4"}
+      [:p
+       "An "
+       (entity :cg/EvidenceStrengthAssertion)
+       " sits at the core of every ClinGen curation. It represents the assertion that a given Clinical Domain Working Group (CDWG) has found the evidence in support of the "
+       (entity :cg/subject)
+       " "
+       (entity :cg/Proposition)
+       " reaches a certain "
+       (entity :cg/evidenceStrength)
+       " as "
+       (entity :cg/specifiedBy)
+       " the SOP used by the group. The "
+       (entity :rdf/type)
+       " of the "
+       (entity :cg/Proposition)
+       " defines the type of curation performed; a Gene Validity curation will have a "
+       (entity :cg/Proposition)
+       " of type "
+       (entity :cg/GeneValidityProposition)
+       " that contains the "
+       (entity :cg/gene)
+       ", "
+       (entity :cg/disease)
+       ", and "
+       (entity :cg/modeOfInheritance)
+       " for the curation."]
+      [:p
+       "It will typically have one or more "
+       (entity :cg/contributions)
+       ". A given "
+       (entity :cg/Contribution)
+       " may include a "
+       (entity :cg/date)
+       " on which the activity is considered to have been performed. For example, the date given for the "
+       (entity :cg/Approver)
+       " represents the date on which the curation was approved by the CDWG. Evidence after this date would not have been considered for the overall "
+       (entity :cg/evidenceStrength)
+       ". The date given for the "
+       (entity :cg/Publisher)
+       " represents the date the curation was published to the ClinGen Data Exchange, and therefore Genegraph and the ClinGen Website."]]
      :properties
-     [:cg/subject :cg/annotations :cg/evidenceStrength :cg/contributions :dc/date :cg/evidence :cg/strengthScore]}
+     [:cg/GCISnapshot
+      :cg/annotations
+      :cg/calculatedEvidenceStrength
+      :cg/changes
+      :cg/contributions
+      :cg/curationReasons
+      :dc/date
+      :dc/description
+      :cg/evidence
+      :cg/evidenceStrength
+      :dc/isVersionOf
+      :cg/sequence
+      :cg/specifiedBy
+      :cg/strengthScore
+      :cg/subject
+      :cg/version]}
     :cg/Contribution
     {:dc/description "An action or set of actions performed by an agent toward the creation, modification, evaluation, or deprecation of an artifact."
      :properties
@@ -109,6 +180,9 @@
     {:dc/description "A book, article, or other documentary resource."
      :properties
      [:dc/creator :dc/title :dc/date :dc/abstract :cg/about]}
+    :cg/Proposition
+    {:dc/Description "An abstract entity representing a possible fact that may be true or false. As abstract entities, Propositions capture a ‘sharable’ piece of meaning whose identify and existence is independent of space and time, or whether it is ever asserted to be true by some agent."
+     :xref "https://va-spec.ga4gh.org/en/latest/core-information-model/entities/proposition.html#proposition"}
     ;; [:ga4gh/CanonicalLocation nil] ; need, but need to think about
     ;; [:ga4gh/SequenceLocation nil] ; need -- incorporate from ga4gh schema
     ;; [:ga4gh/VariationDescriptor nil] ; obsolete, but need for now
@@ -125,12 +199,13 @@
     :skos/member {:type (list :rdfs/Resource)}
     :rdfs/subClassOf {:type (list :owl/Class)}
     :cg/assertions {:type (list :cg/EvidenceStrengthAssertion)}
-    :cg/subject {:type :rdfs/Resource}
+    :cg/subject {:type :rdfs/Resource
+                 :dc/description "The subject of the assertion, frequently a "}
     :cg/annotations {:type (list :cg/AssertionAnnotation)}
     :cg/evidenceStrength {:type :owl/Class} ;; TODO or skos/concept?
     :cg/contributions {:type (list :cg/Contribution)}
     :dc/date {:dc/description
-   "A point or period of time associated with an event in the lifecycle of the resource."
+              "A point or period of time associated with an event in the lifecycle of the resource."
               :type 'String}
     :cg/agent {:type :cg/Agent}
     :cg/role {:type :owl/Class}

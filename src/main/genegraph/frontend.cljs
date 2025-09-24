@@ -12,7 +12,10 @@
             [genegraph.frontend.page.conflict-list :as conflict-list]
             [genegraph.frontend.display.variant]
             [genegraph.frontend.display.assertion]
-            [genegraph.frontend.view :as view]))
+            [genegraph.frontend.view :as view]
+            ["firebase/app" :as firebase]
+            ["firebase/auth" :as auth]
+            [genegraph.frontend.auth :as gg-auth]))
 
 (enable-console-print!)
 
@@ -25,6 +28,26 @@
 (js/console.log (str ENV))
 
 (defonce match (reagent/atom nil))
+
+#_{:apiKey "your-api-key",
+   :authDomain "your-auth-domain",
+   :databaseURL "your-database-url",
+   :projectId "your-project-id",
+   :storageBucket "your-storage-bucket",
+   :messagingSenderId "your-messaging-sender-id"}
+
+(defn firebase-init
+  []
+  (firebase/initializeApp
+   #js {:apiKey "AIzaSyD_TLzPJT3IxX59b_7raOyLka11kLYGYg0",
+        :authDomain "som-clingen-projects.firebaseapp.com",
+        :projectId "som-clingen-projects",
+        :storageBucket "som-clingen-projects.firebasestorage.app",
+        :messagingSenderId "653902215137",
+        :appId "1:653902215137:web:0fb88da97e58e7ab2644a0"})
+  #_(firebase/app)
+  #_(fb-auth/on-auth-state-changed))
+
 
 (defn home-page []
   [:div
@@ -87,12 +110,26 @@
   (.render root (reagent/as-element [routes/router-component
                                {:router routes/router}])))
 
+(re-frame/reg-event-db
+ ::initialize-firebase
+ (fn [db _]
+   (let [app (firebase-init)]
+     (assoc db
+            :firebase-app app
+            :firebase-auth (auth/getAuth)))))
+
 (defn ^:export init []
+  (js/console.log (str "ENV" ENV))
+  (js/console.log (str "BACKEND_WS" BACKEND_WS))
+  (js/console.log (str "BACKEND_HTTP" BACKEND_HTTP))
+  #_(firebase-init)
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch [::re-graph/init
                       {:ws nil #_{:url BACKEND_WS}
                        :http {:url BACKEND_HTTP
                               :impl {:headers {"Access-Control-Allow-Credentials" true}}}}])
   (re-frame/dispatch-sync [::initialize-db])
+  (re-frame/dispatch-sync [::initialize-firebase])
+  (re-frame/dispatch-sync [::gg-auth/init-auth])
   (re-frame/dispatch-sync [::view/init])
   (render-root))

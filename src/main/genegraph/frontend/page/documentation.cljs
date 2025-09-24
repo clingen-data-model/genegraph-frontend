@@ -66,9 +66,29 @@
    (for [t terms]
      ^{:key t}
      [:li {:class "py-4"}
-      [:a
-       {:href (term-href t)}
-       t]])])
+      [:div
+       {:class "flex"}
+       [:div
+        {:class "min-w-80"}
+        [:a
+         {:href (term-href t)}
+         t]]
+       [:div
+        "description"]]])])
+
+#_(defn term-list [terms]
+  [:div
+   {:role "list", :class "grid grid-cols-2"}
+   (for [t terms]
+     ^{:key t}
+     [:div
+      [:div {:class "py-4"}
+       [:a
+        {:href (term-href t)}
+        t]]
+      [:div
+       "description"
+       #_(:dc/description t)]])])
 
 (defmulti entity-detail :rdf/type)
 
@@ -108,14 +128,17 @@
 (defn entity-title [entity entity-kw]
   [:div
    {:class "border-b border-gray-200 pb-5"}
-   [:h3
-    {:class "text-base font-semibold text-gray-900"}
-    entity-kw]
-   [:p (:rdf/type entity)]
-   [:p (:type entity)]
+   [:div
+    {:class "pb-4"}
+    [:h3
+     {:class "text-xl font-semibold text-gray-900"}
+     entity-kw]
+    [:p (:rdf/type entity)]
+    [:p (:type entity)]]
    [:p
     {:class "mt-2 max-w-4xl text-sm text-gray-500"}
-    (:dc/description entity)]])
+    (or (:markup entity)
+        (:dc/description entity))]])
 
 (defn documentation-term []
   (let [entity-kw @(rf/subscribe [::current-entity])
@@ -123,8 +146,7 @@
     [:div
      {:class "px-12 py-12"}
      (entity-title entity entity-kw)
-     (entity-detail entity entity-kw)
-     #_[:pre (with-out-str (cljs.pprint/pprint entity))]]    ))
+     (entity-detail entity entity-kw)]))
 
 
 (defmethod common/secondary-view :documentation-list []

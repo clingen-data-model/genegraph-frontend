@@ -25,6 +25,7 @@
 	"@tailwindcss/forms": "^0.5.10",
 	"create-react-class": "15.7.0",
 	"cross-env": "^7.0.3",
+	"firebase": "^12.2.1",
 	"plotly.js": "^2.35.2",
 	"react": "18.2.0",
 	"react-dom": "18.2.0",

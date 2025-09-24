@@ -444,7 +444,7 @@
       {:class "lg:pl-20"}
       [:div
        {:class
-        "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"}
+        "sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8 bg-white"}
        #_(open-sidebar-button)
        (comment "Separator")
        [:div
@@ -454,9 +454,10 @@
         (if current-user
           (search-form)
           [:div])
-        #_(profile)]]
+        #_(profile)]
+       (auth/login-header-div)]
       (if search-active
         (search/search-result-div)
-        (main))
+        (main))      
       #_[:pre (with-out-str (cljs.pprint/pprint queries/compiled-base-query))]]
      (secondary)]))
