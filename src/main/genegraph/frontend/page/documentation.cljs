@@ -61,34 +61,37 @@
      (entity-list t))])
 
 (defn term-list [terms]
-  [:ul
-   {:role "list", :class "divide-y divide-gray-200"}
-   (for [t terms]
-     ^{:key t}
-     [:li {:class "py-4"}
-      [:div
-       {:class "flex"}
-       [:div
-        {:class "min-w-80"}
-        [:a
-         {:href (term-href t)}
-         t]]
-       [:div
-        "description"]]])])
+  (let [schema (schema/schema-by-id)]
+    [:ul
+     {:role "list", :class "divide-y divide-gray-200"}
+     (for [t terms]
+       ^{:key t}
+       [:li {:class "py-4"}
+        [:div
+         {:class "flex"}
+         [:div
+          {:class "min-w-80"}
+          [:a
+           {:href (term-href t)}
+           t]]
+         [:div
+          (get-in schema [t :dc/description])]]])]))
+
+
 
 #_(defn term-list [terms]
-  [:div
-   {:role "list", :class "grid grid-cols-2"}
-   (for [t terms]
-     ^{:key t}
-     [:div
-      [:div {:class "py-4"}
-       [:a
-        {:href (term-href t)}
-        t]]
-      [:div
-       "description"
-       #_(:dc/description t)]])])
+    [:div
+     {:role "list", :class "grid grid-cols-2"}
+     (for [t terms]
+       ^{:key t}
+       [:div
+        [:div {:class "py-4"}
+         [:a
+          {:href (term-href t)}
+          t]]
+        [:div
+         "description"
+         #_(:dc/description t)]])])
 
 (defmulti entity-detail :rdf/type)
 
