@@ -40,7 +40,7 @@
      (:label entity-class)]]
    [:ul
     {:role "list", :class "divide-y divide-gray-200"}
-    (for [[k v] (sort-by key (get schema/schema (:type entity-class)))]
+    (for [[k v] (sort-by key (get (schema/schema) (:type entity-class)))]
       ^{:key k}
       [:li
        {:class "py-4"}
@@ -142,7 +142,7 @@
 
 (defn documentation-term []
   (let [entity-kw @(rf/subscribe [::current-entity])
-        entity (get schema/schema-by-id entity-kw)]
+        entity (get (schema/schema-by-id) entity-kw)]
     [:div
      {:class "px-12 py-12"}
      (entity-title entity entity-kw)
