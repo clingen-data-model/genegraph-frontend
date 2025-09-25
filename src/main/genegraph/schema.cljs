@@ -13,10 +13,10 @@
     :class "font-medium text-sky-700"}
    e])
 
-(defn schema []
+#_(defn schema []
   {})
 
-#_(defn schema []
+(defn schema []
     {:interfaces
      {:rdfs/Resource
       {:description "An RDF Resource in Genegraph. Common interface to all entities in Genegraph; all entities will inherit from this at some level."
