@@ -302,16 +302,13 @@
                      :cg/AllGenesSequencing]}
     
       :cg/EvidenceStrengthSet
-      {:skos/member [:cg/Definitive {:dc/description "The role of this gene in this particular disease has been repeatedly demonstrated in both the research and clinical diagnostic settings, and has been upheld over time."}
-                     :cg/Strong {:dc/description "Gene-disease
-pairs with strong evidence demonstrate considerable genetic evidence (numerous unrelated
-probands harboring variants with sufficient supporting evidence for disease causality)."}
-                     :cg/Moderate {:dc/description "There is moderate evidence to support a causal role for this gene in this disease. Gene-disease pairs with moderate evidence typically demonstrate some convincing genetic evidence (probands harboring variants with sufficient supporting evidence for disease
-causality with or without moderate experimental data supporting the gene-disease relationship). "}
-                     :cg/Limited {:dc/description "In general, the category of limited should be applied when experts consider the gene-disease relationship to be plausible, but the evidence is not sufficient to score as Moderate."}
-                     :cg/NoKnownDiseaseRelationship {:dc/description "Evidence for a causal role in the monogenic disease of interest (determined using ClinGen lumping and splitting guidance) has not been reported within the literature (published, prepublished and/or present in public databases [e.g. ClinVar , etc.]). These genes might be “candidate” genes based on linkage intervals, animal models, implication in pathways known to be involved in human disease, etc., but no reports have directly implicated the gene in the specified disease."}
-                     :cg/Refuted {:dc/description "Evidence refuting the initial reported evidence for the role of the gene in the specified disease has been reported and significantly outweighs any evidence supporting the role. This designation is to be applied at the discretion of clinical domain experts after thorough review of available data. "}
-                     :cg/Disputed {:dc/description "Although there has been an assertion of a gene-disease relationship, the initial evidence is not compelling from today’s perspective and/or conflicting evidence has arisen."}]}
+      {:skos/member [:cg/Definitive
+                     :cg/Strong 
+                     :cg/Moderate
+                     :cg/Limited 
+                     :cg/NoKnownDiseaseRelationship
+                     :cg/Refuted
+                     :cg/Disputed]}
 
       :cg/VariantZygositySet
       {:skos/member [:cg/Homozygous 
@@ -411,13 +408,23 @@ causality with or without moderate experimental data supporting the gene-disease
       :cg/CandidateGeneSequencing {:rdfs/label "Candidate gene sequencing"},
       :cg/AllGenesSequencing {:rdfs/label "Exome genome or all genes sequenced in linkage region"},
     
-      :cg/Definitive {:rdfs/label "Definitive"},
-      :cg/Strong {:rdfs/label "Strong"},
-      :cg/Moderate {:rdfs/label "Moderate"},
-      :cg/Limited {:rdfs/label "Limited"},
-      :cg/NoKnownDiseaseRelationship {:rdfs/label "No Classification"},
-      :cg/Refuted {:rdfs/label "Refuted"},
-      :cg/Disputed {:rdfs/label "Disputed"},
+      :cg/Definitive {:rdfs/label "Definitive"
+                      :dc/description "The role of this gene in this particular disease has been repeatedly demonstrated in both the research and clinical diagnostic settings, and has been upheld over time."},
+      :cg/Strong {:rdfs/label "Strong"
+                  :dc/description "Gene-disease
+pairs with strong evidence demonstrate considerable genetic evidence (numerous unrelated
+probands harboring variants with sufficient supporting evidence for disease causality)."},
+      :cg/Moderate {:rdfs/label "Moderate"
+                    :dc/description "There is moderate evidence to support a causal role for this gene in this disease. Gene-disease pairs with moderate evidence typically demonstrate some convincing genetic evidence (probands harboring variants with sufficient supporting evidence for disease
+causality with or without moderate experimental data supporting the gene-disease relationship)."},
+      :cg/Limited {:rdfs/label "Limited"
+                   :dc/description "In general, the category of limited should be applied when experts consider the gene-disease relationship to be plausible, but the evidence is not sufficient to score as Moderate."},
+      :cg/NoKnownDiseaseRelationship {:rdfs/label "No Classification"
+                                      :dc/description "Evidence for a causal role in the monogenic disease of interest (determined using ClinGen lumping and splitting guidance) has not been reported within the literature (published, prepublished and/or present in public databases [e.g. ClinVar , etc.]). These genes might be “candidate” genes based on linkage intervals, animal models, implication in pathways known to be involved in human disease, etc., but no reports have directly implicated the gene in the specified disease."},
+      :cg/Refuted {:rdfs/label "Refuted"
+                   :dc/description "Evidence refuting the initial reported evidence for the role of the gene in the specified disease has been reported and significantly outweighs any evidence supporting the role. This designation is to be applied at the discretion of clinical domain experts after thorough review of available data. "},
+      :cg/Disputed {:rdfs/label "Disputed"
+                    :dc/description "Although there has been an assertion of a gene-disease relationship, the initial evidence is not compelling from today’s perspective and/or conflicting evidence has arisen."},
     
       :cg/Homozygous {:rdfs/label "Homozygous"},
       :cg/TwoVariantsInTrans {:rdfs/label "TwoTrans"},

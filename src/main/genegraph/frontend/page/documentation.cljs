@@ -130,8 +130,8 @@
 (defmethod entity-detail :cg/ValueSet [entity entity-kw]
   [:div
    [:div
-    {:class "border-b border-gray-200 pb-5 pt-10"}
-    [:h3 {:class "text-base font-semibold text-gray-900"}
+    {:class "pb-5 pt-10"}
+    [:h3 {:class "text-lg font-semibold text-gray-900"}
      "members"]]
    (term-list (:skos/member entity))])
 
