@@ -60,7 +60,7 @@
       "text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"}
      "Downloads"]
     [:p
-     {:class "mt-2 max-w-4xl text-sm text-gray-500"}
+     {:class "mt-4 max-w-4xl text-sm text-gray-700"}
      "All downloads are generated every six hours using the most recent published data from ClinGen. They are made available in JSON-LD and RDF n-triples formats, compressed into an archive package."]]
    [:ul
     {:role "list", :class "py-10"}

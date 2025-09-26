@@ -193,27 +193,31 @@
    
      :properties
      {:rdfs/label {:type 'String}
-      :rdf/type {:type (list :owl/Class)}
+      :rdf/type {:type '(list :owl/Class)}
       :dc/description {:dc/description "An account of the resource."
                        :type 'String}
       :dc/source {:dc/description "A related resource from which the described resource is derived."
                   :type :rdfs/Resource}
-      :skos/inScheme {:type (list :cg/ValueSet)}
-      :skos/member {:type (list :rdfs/Resource)}
-      :rdfs/subClassOf {:type (list :owl/Class)}
-      :cg/assertions {:type (list :cg/EvidenceStrengthAssertion)}
+      :skos/inScheme {:type '(list :cg/ValueSet)}
+      :skos/member {:type '(list :rdfs/Resource)}
+      :rdfs/subClassOf {:type '(list :owl/Class)}
+      :cg/assertions {:type '(list :cg/EvidenceStrengthAssertion)}
       :cg/subject {:type :rdfs/Resource
-                   :dc/description "The subject of the assertion, frequently a "}
-      :cg/annotations {:type (list :cg/AssertionAnnotation)}
-      :cg/evidenceStrength {:type :owl/Class} ;; TODO or skos/concept?
-      :cg/contributions {:type (list :cg/Contribution)}
+                   :dc/description "The subject of an assertion, typically a Proposition."}
+      :cg/annotations {:type '(list :cg/AssertionAnnotation)
+                       :dc/description "Annotations made on the assertion by ClinGen curators; relevant for the ClinGen Curation of ClinVar project."}
+      :cg/evidenceStrength {:type :owl/Class
+                            :domain :cg/EvidenceStrengthSet
+                            :dc/description "Classification of the evidence according to the criteria used for the assertion."}
+      :cg/contributions {:type '(list :cg/Contribution)
+                         :dc/description "Actions taken by an agent contributing to the creation, modification, assessment, or deprecation of a particular entity (e.g. a Statement, EvidenceLine, DataSet, Publication, etc.)"}
       :dc/date {:dc/description
                 "A point or period of time associated with an event in the lifecycle of the resource."
                 :type 'String}
       :cg/agent {:type :cg/Agent}
       :cg/role {:type :owl/Class}
       :cg/feature {:type :so/SequenceFeature}
-      :cg/observations {:type (list :cg/VariantObservation)}
+      :cg/observations {:type '(list :cg/VariantObservation)}
       :skos/prefLabel {:type 'String}
       :cg/variant {:type :cg/CanonicalVariant}
       :cg/pValue {:type 'Float}
@@ -240,7 +244,8 @@
       :dc/abstract {:dc/description "A summary of the resource."
                     :type 'String}
       :cg/statisticalSignificanceValueType {} ;;investigate
-      :cg/evidence {:type (list :rdfs/Resource)}
+      :cg/evidence {:type '(list :rdfs/Resource)
+                    :dc/description "Evidence relating to the assertion or evidence line."}
       :dc/title {:dc/description "A name given to the resource."
                  :type 'String}
       :cg/ethnicity {:type :owl/Class}
@@ -255,8 +260,9 @@
       :ga4gh/location {}            ; bring in from GA4GH
       :cg/proband {:type :cg/Proband}
       :cg/condition {:type :owl/Class}
-      :owl/sameAs {:type (list :owl/Class)}
-      :cg/strengthScore {:type 'Float}
+      :owl/sameAs {:type '(list :owl/Class)}
+      :cg/strengthScore {:type 'Float
+                         :dc/description "A quantitative score indicating the strength of support that an Evidence Line is determined to provide for or against its target Proposition, evaluated relative to the direction indicated by the directionOfEvidenceProvided value."}
       :cg/phenotypeFreeText {:type 'String}
       :cg/controlCohort {}              ; investigate
       :cg/alleleMappings {}             ; ga4gh allele list
@@ -265,8 +271,28 @@
       :cg/detectionMethod {:type :owl/Class} ;; investigate may actually be 'String
       :cg/estimatedLodScore {:type 'Float}
       :cg/statisticalSignificanceValue {} ;; investigate
-      :skos/hiddenLabel {:type (list 'String)}
-      :cg/mechanism {:type :owl/Class}}
+      :skos/hiddenLabel {:type '(list 'String)}
+      :cg/mechanism {:type :owl/Class}
+      :cg/GCISnapshot {:type 'String :dc/description "Internal identifier from the Gene Curation Interface."}
+      :cg/calculatedEvidenceStrength {:type :owl/Class
+                                      :domain :cg/EvidenceStrengthSet
+                                      :dc/description "Evidence strength calculated by the algorithm for the curation criteria (SOP), prior to any adjustment by the Expert Panel."}
+      :cg/changes {:type '(list :owl/Class)
+                   :domain :cg/ChangeReasonSet
+                   :dc/description "List of elements changed in this version relative to the previous version"}
+      :cg/curationReasons {:type '(list :owl/Class)
+                           :domain :cg/CurationReasonSet
+                           :dc/description "Reasons listed for performing the curation."}
+      :dc/isVersionOf {:type :rdfs/Resource
+                       :dc/description "A related resource of which the described resource is a version, edition, or adaptation. Used in ClinGen resources to link version of a curation together using a consistent identifier."}
+      :cg/sequence {:type 'Int
+                    :dc/description "Sequence in which this curation was published to the ClinGen data exchange."}
+      :cg/specifiedBy {:type :owl/Class
+                       :domain :cg/ClinGenCriteriaSet
+                       :dc/description "Criteria used to support the assessment made. Provides a reference for the significance of the score, and the methodology used to achieve said score."}
+      :cg/version {:type 'String
+                   :dc/description "Version of the given resource, using ClinGen's Semantic Versioning Scheme."}
+      }
 
      :value-sets
      {:cg/StudyGeneticAnalysisSet
@@ -276,13 +302,16 @@
                      :cg/AllGenesSequencing]}
     
       :cg/EvidenceStrengthSet
-      {:skos/member [:cg/Definitive
-                     :cg/Strong
-                     :cg/Moderate
-                     :cg/Limited
-                     :cg/NoKnownDiseaseRelationship
-                     :cg/Refuted
-                     :cg/Disputed]}
+      {:skos/member [:cg/Definitive {:dc/description "The role of this gene in this particular disease has been repeatedly demonstrated in both the research and clinical diagnostic settings, and has been upheld over time."}
+                     :cg/Strong {:dc/description "Gene-disease
+pairs with strong evidence demonstrate considerable genetic evidence (numerous unrelated
+probands harboring variants with sufficient supporting evidence for disease causality)."}
+                     :cg/Moderate {:dc/description "There is moderate evidence to support a causal role for this gene in this disease. Gene-disease pairs with moderate evidence typically demonstrate some convincing genetic evidence (probands harboring variants with sufficient supporting evidence for disease
+causality with or without moderate experimental data supporting the gene-disease relationship). "}
+                     :cg/Limited {:dc/description "In general, the category of limited should be applied when experts consider the gene-disease relationship to be plausible, but the evidence is not sufficient to score as Moderate."}
+                     :cg/NoKnownDiseaseRelationship {:dc/description "Evidence for a causal role in the monogenic disease of interest (determined using ClinGen lumping and splitting guidance) has not been reported within the literature (published, prepublished and/or present in public databases [e.g. ClinVar , etc.]). These genes might be “candidate” genes based on linkage intervals, animal models, implication in pathways known to be involved in human disease, etc., but no reports have directly implicated the gene in the specified disease."}
+                     :cg/Refuted {:dc/description "Evidence refuting the initial reported evidence for the role of the gene in the specified disease has been reported and significantly outweighs any evidence supporting the role. This designation is to be applied at the discretion of clinical domain experts after thorough review of available data. "}
+                     :cg/Disputed {:dc/description "Although there has been an assertion of a gene-disease relationship, the initial evidence is not compelling from today’s perspective and/or conflicting evidence has arisen."}]}
 
       :cg/VariantZygositySet
       {:skos/member [:cg/Homozygous 
@@ -353,6 +382,17 @@
                      :cg/MonoallelicHeterozygous]}
 
       :cg/ChangeReasonSet
+      {:skos/member [:cg/NewCuration
+                     :cg/DiseaseNameUpdate
+                     :cg/ErrorClarification
+                     :cg/RecurationCommunityRequest
+                     :cg/RecurationTiming
+                     :cg/RecurationNewEvidence
+                     :cg/RecurationFrameworkChange
+                     :cg/RecurationErrorAffectingScoreorClassification
+                     :cg/RecurationDiscrepancyResolution]}
+
+      :cg/CurationReasonSet
       {:skos/member [:cg/NewCuration
                      :cg/DiseaseNameUpdate
                      :cg/ErrorClarification

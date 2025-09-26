@@ -48,6 +48,21 @@
         {:href (term-href k)}
         k]])]])
 
+(defn entity-ref [e]
+  (if (keyword? e)
+    [:a
+     {:href (term-href e)
+      :class "font-medium text-sky-700"}
+     e]
+    e))
+
+(defn documentation-intro []
+  [:div
+   {:class "pt-4 max-w-4xl text-sm text-gray-700"}
+   "The data model supporting ClinGen curations, and especially Gene Validity, is large, complex, and expanding. For a basic introduction starting with the documentation for "
+   (entity-ref :cg/EvidenceStrengthAssertion)
+   " is recommended."])
+
 (defn documentation []
   [:div
    {:class "px-12 py-12"}
@@ -56,50 +71,53 @@
     [:h2
      {:class
       "text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"}
-     "Documentation"]]
+     "Documentation"]
+    (documentation-intro)]
    (for [t entity-types]
      (entity-list t))])
+
+
+;; Please explain why the following case statement in clojurescript
+;; does not work as expected 
+(defn type-div [t]
+  #_(js/console.log (type t))
+  (cond 
+    (symbol? t) [:div (str t)]
+    (keyword? t) [:div (entity-ref t)]
+    (list? t) [:div "[" (entity-ref (second t)) "]"]
+    :default [:div]))
 
 (defn term-list [terms]
   (let [schema (schema/schema-by-id)]
     [:ul
-     {:role "list", :class "divide-y divide-gray-200"}
+     {:role "list", :class "text-sm grid  grid-cols-[auto_auto_auto] gap-4 divide-y divide-gray-200"}
      (for [t terms]
        ^{:key t}
-       [:li {:class "py-4"}
+       [:li {:class "pb-4 grid col-span-3 grid-cols-subgrid"}
         [:div
-         {:class "flex"}
-         [:div
-          {:class "min-w-80"}
-          [:a
-           {:href (term-href t)}
-           t]]
-         [:div
-          (get-in schema [t :dc/description])]]])]))
-
-
-
-#_(defn term-list [terms]
-    [:div
-     {:role "list", :class "grid grid-cols-2"}
-     (for [t terms]
-       ^{:key t}
-       [:div
-        [:div {:class "py-4"}
-         [:a
+         (entity-ref t)
+         #_[:a
           {:href (term-href t)}
           t]]
         [:div
-         "description"
-         #_(:dc/description t)]])])
+         (type-div (get-in schema [t :type]))
+         (when-let [d (get-in schema [t :domain])]
+           [:div
+            {:class "flex gap-2"}
+            [:div
+             "∈"]
+            (type-div d)])]
+        [:div
+         {:class "text-gray-500"}
+         (get-in schema [t :dc/description])]])]))
 
 (defmulti entity-detail :rdf/type)
 
 (defmethod entity-detail :owl/Class [entity entity-kw]
   [:div
    [:div
-    {:class "border-b border-gray-200 pb-5 pt-10"}
-    [:h3 {:class "text-base font-semibold text-gray-900"} "properties"]]
+    {:class "pb-8 pt-12"}
+    [:h3 {:class "text-lg font-semibold text-gray-900"} "Properties"]]
    (term-list (:properties entity))])
 
 (defmethod entity-detail :rdf/Property [entity entity-kw]
@@ -139,7 +157,7 @@
     [:p (:rdf/type entity)]
     [:p (:type entity)]]
    [:p
-    {:class "mt-2 max-w-4xl text-sm text-gray-500"}
+    {:class "mt-2 max-w-4xl text-sm text-gray-700"}
     (or (:markup entity)
         (:dc/description entity))]])
 
