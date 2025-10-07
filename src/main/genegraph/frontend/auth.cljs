@@ -2,6 +2,7 @@
   (:require [re-frame.core :as rf]
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.icon :as icon]
+            [re-graph.core :as re-graph]
             ["firebase/app" :as firebase]
             ["firebase/auth" :as auth]))
 
@@ -85,12 +86,20 @@
    (auth/onAuthStateChanged
     (auth/getAuth)
     (fn [user]
-      (rf/dispatch
-       [::set-user
-        (if user
-          user
-          (js/console.log "no user after auth state change"))])))
+      (if user
+        (-> user
+            .getIdToken
+            js/Promise.resolve
+            (.then #(rf/dispatch [:update-user-token %])))
+        (rf/dispatch
+         [::set-user user]))))
    {}))
+
+#_(-> (auth/getAuth)
+    .-currentUser
+    .getIdToken
+    js/Promise.resolve
+    (.then #(js/console.log %)))
 
 (rf/reg-event-db
  ::show-auth
@@ -166,14 +175,6 @@
  (fn [user _]
    (some? user)))
 
-
-;; ## Auth Component with TailwindCSS
-;; ```clojure
-;; (ns myapp.components.auth
-;;   (:require [reagent.core :as r]
-;;             [re-frame.core :as rf]
-;;             [myapp.events :as events]
-;;             [myapp.subs :as subs]))
 
 (defn auth-button [provider-name icon-class on-click disabled?]
   [:button
@@ -251,32 +252,6 @@
         (authenticated-div user)
         (unauthenticated-div loading?))]]))
 
-
-;; ## HTML Template
-;; ```html
-;; <!DOCTYPE html>
-;; <html>
-;; <head>
-;;     <script src="https://cdn.tailwindcss.com"></script>
-;;     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-;; </head>
-;; <body>
-;;     <div id="app"></div>
-;;     <script src="js/main.js"></script>
-;; </body>
-;; </html>
-;; ```
-
-;; This implementation provides:
-;; - Firebase auth initialization with Google/Microsoft providers
-;; - Re-frame events for sign-in/out operations
-;; - Loading states and error handling
-;; - Responsive UI with TailwindCSS
-;; - Auth state management and persistence
-
-;; Remember to configure your Firebase project with the appropriate OAuth providers in the Firebase Console.
-
-
 (rf/reg-sub
  ::current-user
  (fn [db _]
@@ -284,3 +259,5 @@
      nil
      {:id 0
       :name "test"})))
+
+

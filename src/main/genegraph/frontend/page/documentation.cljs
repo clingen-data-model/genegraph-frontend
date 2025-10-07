@@ -80,7 +80,6 @@
 ;; Please explain why the following case statement in clojurescript
 ;; does not work as expected 
 (defn type-div [t]
-  #_(js/console.log (type t))
   (cond 
     (symbol? t) [:div (str t)]
     (keyword? t) [:div (entity-ref t)]
@@ -120,6 +119,13 @@
     [:h3 {:class "text-lg font-semibold text-gray-900"} "Properties"]]
    (term-list (:properties entity))])
 
+(defmethod entity-detail :cg/Interface [entity entity-kw]
+  [:div
+   [:div
+    {:class "pb-8 pt-12"}
+    [:h3 {:class "text-lg font-semibold text-gray-900"} "Properties"]]
+   (term-list (:properties entity))])
+
 (defmethod entity-detail :rdf/Property [entity entity-kw]
   [:div
    [:div
@@ -151,11 +157,17 @@
    {:class "border-b border-gray-200 pb-5"}
    [:div
     {:class "pb-4"}
-    [:h3
-     {:class "text-xl font-semibold text-gray-900"}
-     entity-kw]
-    [:p (:rdf/type entity)]
-    [:p (:type entity)]]
+    ;; how do I get the following divs to align their text along the baseline
+    ;; using hiccup and tailwind css?
+    [:div
+     {:class "flex gap-2 items-baseline"}
+     [:div
+      {:class "text-xl font-semibold text-gray-900"}
+      entity-kw]
+     (when (:rdfs/subClassOf entity) [:div "<"])
+     (type-div (:rdfs/subClassOf entity))]
+    [:div (:rdf/type entity)]
+]
    [:p
     {:class "mt-2 max-w-4xl text-sm text-gray-700"}
     (or (:markup entity)

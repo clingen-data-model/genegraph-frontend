@@ -118,6 +118,17 @@
             :firebase-app app
             :firebase-auth (auth/getAuth)))))
 
+(re-frame/reg-event-fx
+ :update-user-token
+ (fn [_ [_ token]]
+   (js/console.log token)
+   #_{}
+   {:fx [:dispatch
+         [::re-graph/init
+          {:ws nil #_{:url BACKEND_WS}
+           :http {:url BACKEND_HTTP
+                  :impl {:headers {"Access-Control-Allow-Credentials" true}}}}]]}))
+
 (defn ^:export init []
   (js/console.log (str "ENV" ENV))
   (js/console.log (str "BACKEND_WS" BACKEND_WS))

@@ -24,14 +24,15 @@
        ;; we'll see how things work,
        ;; but IRI and CURIE might be special--will have to deal later
        :properties
-       [:rdfs/label :rdf/type :dc/description :dc/source :dc/description :skos/inScheme]}}
+       [:rdfs/label :rdf/type :dc/description :dc/source :skos/inScheme]}}
      :classes
      {:owl/Class
       {:dc/description "A class of resources. Ontological terms are typically represented as classes."
        :properties
        [:rdfs/subClassOf]}
       :cg/Agent
-      {:dc/description "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity."}
+      {:dc/description "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity."
+       :rdfs/subClassOf :rdfs/Resource}
       :cg/ValueSet
       {:dc/description "Terms drawn from one or more terminologies and defined as a separate set, generally for specific coding purposes and given a formal designation."
        :properties
@@ -116,6 +117,7 @@
        [:cg/evidence :cg/strengthScore :cg/evidenceStrength]}
       :cg/CanonicalVariant ;; Refactor around CatVRS? not right now
       {:rdfs/label "Cannonical Allele"
+       :rdfs/subClassOf :cg/Resource
        :dc/description "A concept encompassing all alleles that can be mapped to the given allele. May optionally include a set of alleleMappings of equivalent alleles. May also include a source for the set of mappings and associated identifier."
        :properties
        [:cg/allele :cg/alleleMappings]}
@@ -126,12 +128,14 @@
        [:cg/variant :cg/condition]}
       :cg/AssertionAnnotation
       {:rdfs/label "Assertion Annotation"
+       :rdfs/subClassOf :rdfs/Resource
        :dc/description "Annotation on an assertion. May be used to annotate whether the person performing the annotation agrees with the assertion or not."
        :properties
        [:cg/subject :cg/evidence :cg/classification :cg/contributions]}
       :cg/GeneValidityProposition
       {:rdfs/label "Gene Validity Proposition"
        :dc/description "The proposition that variants affecting a gene are causative of a disease, given a mode of inheritance. Such variants are therefore valid to report to patients as pathogenic, given appropriate variant evaluation criteria."
+       :rdfs/subClassOf :cg/Proposition
        :properties
        [:cg/gene :cg/modeOfInheritance :cg/disease]}
       :cg/VariantObservation ;; Maybe want to use just Observation, FHIR style? Let's do that
@@ -151,6 +155,7 @@
        :cg/note "Currently does not support properties beyond standard Resource properties"}
       :cg/Affiliation ;; Can keep, but need to sort out the relationships with Agents, etc
       {:dc/description "A ClinGen affiliation (such as a Gene Curation Expert Panel) is one of the groups responsible for producing ClinGen expert knowledge."
+       :rdfs/subClassOf :cg/Agent
        :properties
        []}
       :cg/Finding
@@ -165,11 +170,13 @@
       :cg/Family
       {:dc/description "A group of biologically related individuals who share genetic material and are studied together to understand inheritance patterns, genetic disease transmission, or trait heritability."
        :properties
-       [:cg/member :cg/ethnicity :cg/modeOfInheritance]}
-      :cg/Cohort
+       [:cg/member :cg/ethnicity :cg/modeOfInheritance]} ;; TODO mode of inheritance is weird here investigate
+      :cg/Cohort ;; TODO validate use of fields and significance
       {:dc/description "A defined group of individuals who are followed over time to investigate the relationship between genetic factors and health outcomes or traits."
+       :rdfs/subClassOf :cg/Resource
        :properties
-       [:cg/evidence :cg/detectionMethod :cg/allGenotypedSequenced :cg/numWithVariant :cg/alleleFrequency :cg/relatedCondition]}
+       [:cg/evidence :cg/detectionMethod :cg/allGenotypedSequenced :cg/numWithVariant :cg/alleleFrequency :cg/relatedCondition]
+       :cg/note "Investigate why the evidence property is used here."}
       :cg/VariantFunctionalImpactEvidence
       {:dc/description "Data demonstrating how a genetic variant affects biological function."
        :properties
@@ -192,18 +199,21 @@
       }
    
      :properties
-     {:rdfs/label {:type 'String}
-      :rdf/type {:type '(list :owl/Class)}
+     {:rdfs/label {:type 'String
+                   :dc/description "A human-readable name for the subject."}
+      :rdf/type {:type '(list :owl/Class)
+                 :dc/description "The subject is an instance of a class."}
       :dc/description {:dc/description "An account of the resource."
                        :type 'String}
       :dc/source {:dc/description "A related resource from which the described resource is derived."
                   :type :rdfs/Resource}
-      :skos/inScheme {:type '(list :cg/ValueSet)}
+      :skos/inScheme {:type '(list :cg/ValueSet)
+                      :dc/description "Relates a resource (for example a concept) to a concept scheme in which it is included."}
       :skos/member {:type '(list :rdfs/Resource)}
       :rdfs/subClassOf {:type '(list :owl/Class)}
       :cg/assertions {:type '(list :cg/EvidenceStrengthAssertion)}
-      :cg/subject {:type :rdfs/Resource
-                   :dc/description "The subject of an assertion, typically a Proposition."}
+      :cg/subject {:type :cg/Proposition
+                   :dc/description "The subject of this entity, typically a Proposition or an Assertion."}
       :cg/annotations {:type '(list :cg/AssertionAnnotation)
                        :dc/description "Annotations made on the assertion by ClinGen curators; relevant for the ClinGen Curation of ClinVar project."}
       :cg/evidenceStrength {:type :owl/Class
@@ -214,14 +224,18 @@
       :dc/date {:dc/description
                 "A point or period of time associated with an event in the lifecycle of the resource."
                 :type 'String}
-      :cg/agent {:type :cg/Agent}
-      :cg/role {:type :owl/Class}
+      :cg/agent {:type :cg/Agent
+                 :dc/description "The agent associated with this contribution."}
+      :cg/role {:type :owl/Class
+                :dc/description "The role performed by the agent making this contribution."
+                :domain :cg/ContributionSet}
       :cg/feature {:type :so/SequenceFeature}
       :cg/observations {:type '(list :cg/VariantObservation)}
       :skos/prefLabel {:type 'String}
       :cg/variant {:type :cg/CanonicalVariant}
       :cg/pValue {:type 'Float}
-      :cg/classification {:type :owl/Class}
+      :cg/classification {:type :owl/Class
+                          :dc/description "The classification of the subject entity"}
       :dc/creator {:dc/description "An entity responsible for making the resource."
                    :type :cg/Agent}
       :cg/functionalDataSupport {} ;; investigate
@@ -231,15 +245,20 @@
       :cg/caseCohort {} ;; investigate
       :cg/publishedLodScore {:type 'Float}
       :cg/allGenotypedSequenced {} ;; investigate, boolean?
-      :cg/allele {} ;; source CannonicalAllele, refers to ga4gh allele
+      :cg/allele {:type :ga4gh/Allele
+                  :dc/description "The allele defining a CanonicalVariant. Any allele that can map to this allele. is condidered to be included in the set of variants defined by this CanonicalVariant"} ;; source CannonicalAllele, refers to ga4gh allele
       :cg/numWithVariant {:type 'Int}
       :ga4gh/definingLocation {}  ;; ga4gh location
       :cg/lowerConfidenceLimit {} ;; investigate
-      :cg/family {:type :cg/Family}
+      :cg/family {:type :cg/Family
+                  :dc/description "The family demonstrating the segregation."}
       :cg/alleleFrequency {} ;; investigate
-      :cg/phenotype {:type :owl/Class :cg/note "recommended to use HPO terms"}
+      :cg/phenotype {:type :owl/Class
+                     :dc/description "The phenotype used for the segregation study. Recommended to use terms from Human Phenotype Ontology"
+                     :cg/note "recommended to use HPO terms"}
       :cg/upperConfidenceLimit {}           ; investigate
-      :cg/member {:type (list :cg/Proband)} ; update to family member?
+      :cg/member {:type '(list :cg/Proband)
+                  :dc/description "Members of the family."} ; update to family member?
       :cg/disease {:type :owl/Class}
       :dc/abstract {:dc/description "A summary of the resource."
                     :type 'String}
@@ -248,28 +267,41 @@
                     :dc/description "Evidence relating to the assertion or evidence line."}
       :dc/title {:dc/description "A name given to the resource."
                  :type 'String}
-      :cg/ethnicity {:type :owl/Class}
+      :cg/ethnicity {:type :owl/Class
+                     :dc/description "Ethnicity of the family"
+                     :domain :cg/EthnicitySet}
       :cg/sequencingMethod {:type :owl/Class}
-      :cg/meetsInclusionCriteria {}           ; boolean?
+      :cg/meetsInclusionCriteria {:type 'Boolean
+                                  :dc/description "Whether the study meets inclusion criteria for consideration in the Gene Validity Evaluation framework."}           ; boolean? TODO consider rename
       :cg/relatedCondition {:type :owl/Class} ; also investigate
       :cg/phenotypeNegativeAlleleNegative {}  ; boolean?
       :cg/statisticalSignificanceType {:type :owl/Class} ; also investigate
-      :cg/phenotypePositiveAllelePositive {}             ; boolean?
-      :cg/modeOfInheritance {:type :owl/Class :cg/note "domain is HPO terms for MOI"} 
+      :cg/phenotypePositiveAllelePositive {:type 'Boolean
+                                           :dc/description "Whether family members positive for the inherited allele demonstrate the given phenotype."}             ; boolean?
+      :cg/modeOfInheritance {:type :owl/Class
+                             :cg/note "domain is HPO terms for MOI"
+                             :dc/description "The clinical validity of variants is contrained by this mode of inheritance. Should be a subclass of HPO:0000005 (mode of inheritance)"} 
       :cg/demonstrates {}           ; investigate, think is :owl/Class
       :ga4gh/location {}            ; bring in from GA4GH
-      :cg/proband {:type :cg/Proband}
+      :cg/proband {:type :cg/Proband
+                   :dc/description "The first person in the family presenting with the condition to clinicians or researchers."}
       :cg/condition {:type :owl/Class}
       :owl/sameAs {:type '(list :owl/Class)}
       :cg/strengthScore {:type 'Float
                          :dc/description "A quantitative score indicating the strength of support that an Evidence Line is determined to provide for or against its target Proposition, evaluated relative to the direction indicated by the directionOfEvidenceProvided value."}
       :cg/phenotypeFreeText {:type 'String}
       :cg/controlCohort {}              ; investigate
-      :cg/alleleMappings {}             ; ga4gh allele list
-      :cg/gene {:type :so/SequenceFeature}
+      :cg/alleleMappings {:type '(list :ga4gh/Allele)
+                          :dc/description "A set of alleles known to map to this CanonicalVariant."}             ; ga4gh allele list
+      :cg/gene {:type :so/SequenceFeature
+                :dc/description "Variants affecting this gene are valid for clinical classification."}
       :so/ChromosomeBand {:type 'String} ; should maybe be sequence feature
-      :cg/detectionMethod {:type :owl/Class} ;; investigate may actually be 'String
-      :cg/estimatedLodScore {:type 'Float}
+      :cg/detectionMethod {:type :owl/Class
+                           :dc/description "Variant detection method used for the relevant study."
+                           :domain :cg/VariantDetectionMethodSet
+                           } ;; investigate may actually be 'String
+      :cg/estimatedLodScore {:type 'Float
+                             :dc/description "LOD score"}
       :cg/statisticalSignificanceValue {} ;; investigate
       :skos/hiddenLabel {:type '(list 'String)}
       :cg/mechanism {:type :owl/Class}
@@ -399,6 +431,11 @@
                      :cg/RecurationFrameworkChange
                      :cg/RecurationErrorAffectingScoreorClassification
                      :cg/RecurationDiscrepancyResolution]}
+
+      :cg/ContributionSet
+      {:skos/member [:cg/Approver
+                     :cg/Publisher
+                     :cg/SecondaryContributor]}
     
       }
    
@@ -438,7 +475,14 @@ causality with or without moderate experimental data supporting the gene-disease
       :cg/GeneValidityCriteria9 {:rdfs/label "9"},
       :cg/GeneValidityCriteria10 {:rdfs/label "10"},
       :cg/GeneValidityCriteria11 {:rdfs/label "11"},
-    
+
+      :cg/Approver {:rdfs/label "Approver"
+                    :dc/description "The approval of a given resource."}
+      :cg/Publisher {:rdfs/label "Publisher"
+                     :dc/description "The publication of a given resource."}
+      :cg/SecondaryContributor {:rdfs/label "Secondary Contributor"
+                                :dc/description "An additional contribution to the resource, typically made by a group with complementary expertise to the primary contributor."}
+      
       :cg/AmbiguousSex {:rdfs/label "Ambiguous"},
       :cg/Female {:rdfs/label "Female"},
       :cg/Intersex {:rdfs/label "Intersex"},
