@@ -265,7 +265,7 @@
     :on-submit (fn [e]
                  (.preventDefault e)
                  (rf/dispatch
-                  [::search/text-search]))}
+                  [::search/text-search]))} ;; TODO CLEANUP not used and not working
    
    [:input
     {:type "search",

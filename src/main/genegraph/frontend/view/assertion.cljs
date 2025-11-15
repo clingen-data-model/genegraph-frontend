@@ -4,6 +4,7 @@
             [reitit.frontend.easy :as rfe]
             [genegraph.frontend.icon :as icon]
             [genegraph.frontend.common :as common]
+            [genegraph.frontend.fragment.assertion-list :as assertion-list]
             [clojure.string :as str]))
 
 
@@ -173,7 +174,9 @@
   (->> contribs (filter #(= role (get-in % [:role :curie])))))
 
 (defn activity-date [activity]
-  (subs (:date activity) 0 10))
+  (if-let [date (:date activity)]
+    (subs date 0 10)
+    ""))
 
 (defn contributions-div [assertion]
   (let [contribs (:contributions assertion)
@@ -292,9 +295,61 @@
        (versions assertion)]]
      [:pre (with-out-str (cljs.pprint/pprint assertion))]]))
 
+(defn variant-path-header [assertion]
+  [:header
+   [:div
+    {:class "mx-auto max-w-7xl pt-12 "}
+    [:div
+     {:class
+      "mx-auto flex max-w-2xl items-center justify-between gap-x-8 lg:mx-0 lg:max-w-none"}
+     [:div
+      {:class "flex items-center  gap-x-6"}
+      [:div
+       {:class "font-semibold text-lg"}
+       (get-in assertion [:subject :variant :label])]
+      #_[:div
+       [:div
+        {:class "font-normal"}
+        (:label disease)]
+       [:div
+        {:class "font-light text-gray-500"}
+        (:label moi)]]]
+     [:div
+      {:class "text-right"}
+      [:div
+       {:class "text-base font-bold text-gray-900"}
+       (get-in assertion [:classification :label])]
+      [:div
+       {:class "text-sm/6 text-gray-500"}
+       (get-in assertion [:specifiedBy :label])]]]]])
+
+(defn conflicts-div [])
+
+(defn variant-pathogenicity-assertion [assertion]
+  [:main
+   {:class "px-4 sm:px-6 lg:px-8"}
+   (variant-path-header assertion)
+   [:div
+    [:h3 {:class "font-semibold text-lg py-4"}
+     "conflicting assertions"]
+    (assertion-list/assertion-list-div (:conflictingAssertions assertion))]
+   
+   #_[:div
+      {:class "mx-auto max-w-7xl py-16 sm:px-6"}
+      [:div
+       {:class
+        "mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"}
+       [:div
+        {:class "lg:col-start-3 lg:row-end-1"}
+        [:h2 {:class "sr-only"} "Summary"]
+        (contributions-div assertion)]
+       (gene-validity-assertion-evidence-detail assertion)
+       (versions assertion)]]
+   [:pre (with-out-str (cljs.pprint/pprint assertion))]])
 
 (defmethod common/main-view "EvidenceStrengthAssertion" [assertion]
   (case (get-in assertion [:subject :__typename])
     "GeneValidityProposition" (validity-assertion assertion)
-    "GeneticConditionMechanismProposition" (mechanism-assertion assertion)))
+    "GeneticConditionMechanismProposition" (mechanism-assertion assertion)
+    "VariantPathogenicityProposition" (variant-pathogenicity-assertion assertion)))
 

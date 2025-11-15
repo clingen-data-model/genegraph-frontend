@@ -36,7 +36,8 @@
       [:span
        {:class
         "inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset"}
-       (str/replace  (:label t) #"_" " ")])]])
+       (if (:label t)
+         (str/replace  (:label t) #"_" " "))])]])
 
 (defn feature-types [feature]
   [:div
@@ -275,21 +276,20 @@
 
 (defmethod common/main-view "SequenceFeature" [feature]
   (let [grouped-assertions (group-by #(get-in % [:subject :__typename])
-                                     (:assertions feature))
-        grouped-variants (group-by #(get-in % [:copyChange :curie])
-                                   (:overlappingVariants feature))]
-    [:div
-     {:class "flex flex-col gap-6"}
-     (feature-title feature)
-     #_(feature-types feature)
-     (mechanism-assertions (get grouped-assertions
-                                "GeneticConditionMechanismProposition"))
-     (validity-assertions (get grouped-assertions
-                               "GeneValidityProposition"))
-     (overlapping-features (:overlappingFeatures feature))
-     (overlapping-variants "Overlapping Copy Number Loss"
-                           (get grouped-variants "EFO:0030067"))
-     (overlapping-variants "Overlapping Copy Number Gain"
-                           (get grouped-variants "EFO:0030070"))
-     [:div
-      [:pre (with-out-str (cljs.pprint/pprint feature))]]]))
+                                       (:assertions feature))
+          grouped-variants (group-by #(get-in % [:copyChange :curie])
+                                     (:overlappingVariants feature))]
+      [:div
+       {:class "flex flex-col gap-6"}
+       (feature-title feature)
+       (mechanism-assertions (get grouped-assertions
+                                  "GeneticConditionMechanismProposition"))
+       (validity-assertions (get grouped-assertions
+                                 "GeneValidityProposition"))
+       (overlapping-features (:overlappingFeatures feature))
+       (overlapping-variants "Overlapping Copy Number Loss"
+                             (get grouped-variants "EFO:0030067"))
+       (overlapping-variants "Overlapping Copy Number Gain"
+                             (get grouped-variants "EFO:0030070"))
+       [:div
+        [:pre (with-out-str (cljs.pprint/pprint feature))]]]))

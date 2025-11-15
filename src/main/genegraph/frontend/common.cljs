@@ -37,7 +37,13 @@
 
 (defmulti main-view :__typename)
 
+(defmethod main-view :default [e]
+  [:div "no view defined"])
+
 (defmulti secondary-view :__typename)
+
+(defmethod secondary-view :default [e]
+  [:div "no view defined"])
 
 (def curie->pill
   {"CG:Haploinsufficiency" {:label "HS"

@@ -107,8 +107,16 @@
        #{{:typename "Resource" :detail-level 1}}}}
    "EvidenceStrengthAssertion"
    {3 {:fragment "{
+    label    
     version
     description
+    conflictingAssertions {
+      ...EvidenceStrengthAssertion2
+    }
+    classification {
+      curie
+      label
+    }
     curationReasons {
       curie
     }
@@ -162,8 +170,15 @@
                        {:typename "GeneticConditionMechanismProposition"
                         :detail-level  1}}}
     2 {:fragment "{
+    curie
+    iri
+    label
     version
     evidenceStrength {
+      curie
+      label
+    }
+    classification {
       curie
       label
     }
@@ -229,8 +244,17 @@
    "VariantPathogenicityProposition"
    {1 {:fragment "{
         variant {
+          ...Resource1
           iri
           label
+          copyChange {
+            curie
+            label
+          }
+          overlappingFeatures {
+            curie
+            label
+          }
         }
 }"}}
    "Resource"

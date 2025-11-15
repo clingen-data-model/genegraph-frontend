@@ -57,6 +57,8 @@
             :variables {:query value}
             :callback [::recieve-result]}]]]}))
 
+
+;; TODO CLEANUP this is not used and wouldn't work
 (rf/reg-event-fx
  ::text-search
  (fn [{:keys [db]} [_ text]]

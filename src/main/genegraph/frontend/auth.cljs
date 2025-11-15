@@ -80,26 +80,34 @@
       (.then #(println %)))
   )
 
+#_(-> (auth/getAuth)
+    .-currentUser
+    .getIdToken
+    js/Promise.resolve
+    (.then #(js/console.log %)))
+
+#_(-> (auth/getAuth)
+    .-currentUser
+#_    .getIdToken
+#_    js/Promise.resolve
+#_    (.then #(js/console.log %)))
+
 (rf/reg-event-fx
  ::init-auth
  (fn [_ _]
    (auth/onAuthStateChanged
     (auth/getAuth)
     (fn [user]
-      (if user
+      (when user
         (-> user
             .getIdToken
             js/Promise.resolve
-            (.then #(rf/dispatch [:update-user-token %])))
-        (rf/dispatch
-         [::set-user user]))))
+            (.then #(rf/dispatch [:update-user-token %]))))
+      (rf/dispatch
+       [::set-user user])))
    {}))
 
-#_(-> (auth/getAuth)
-    .-currentUser
-    .getIdToken
-    js/Promise.resolve
-    (.then #(js/console.log %)))
+
 
 (rf/reg-event-db
  ::show-auth

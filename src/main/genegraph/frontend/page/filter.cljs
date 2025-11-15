@@ -1,13 +1,9 @@
 (ns genegraph.frontend.page.filter
   (:require [re-frame.core :as rf]
-            [genegraph.frontend.filters :as filters]))
-
-(defn display-results-div [results]
-  [:div
-   [:div
-    {:on-click #(rf/dispatch [::filters/clear-query-result])}
-    "clear"]
-   [:pre (with-out-str (cljs.pprint/pprint results))]])
+            [genegraph.frontend.filters :as filters]
+            [genegraph.frontend.common :as common]
+            [genegraph.frontend.icon :as icon]
+            [genegraph.frontend.fragment.assertion-list :as assertion-list]))
 
 (defn select-filter-div []
   [:div
@@ -39,5 +35,10 @@
 
 (defn filter-div []
   (if-let [results @(rf/subscribe [::filters/query-result])]
-    (display-results-div results)
+    #_(display-results-div results)
+    [:div
+     (assertion-list/assertion-list-div results)
+     [:div
+      {:on-click #(rf/dispatch [::filters/clear-query-result])}
+      "clear"]]
     (select-filter-div)))

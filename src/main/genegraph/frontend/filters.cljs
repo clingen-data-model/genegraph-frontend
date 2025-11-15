@@ -11,6 +11,7 @@ query ($filters: [Filter]) {
   assertions(filters: $filters) {
     __typename
     iri
+    curie
     label
     annotations {
       classification {
@@ -19,14 +20,17 @@ query ($filters: [Filter]) {
     }
     classification {
       curie
+      label
     }
     contributions {
       agent {
         iri
+        curie
         label
       }
       role {
         iri
+        curie
         label
       }
       date
@@ -38,7 +42,6 @@ query ($filters: [Filter]) {
   }
 }
 "))
-(println graphql-query) 
  
 (re-frame/reg-event-fx
  ::send-query

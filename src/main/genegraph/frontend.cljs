@@ -29,13 +29,6 @@
 
 (defonce match (reagent/atom nil))
 
-#_{:apiKey "your-api-key",
-   :authDomain "your-auth-domain",
-   :databaseURL "your-database-url",
-   :projectId "your-project-id",
-   :storageBucket "your-storage-bucket",
-   :messagingSenderId "your-messaging-sender-id"}
-
 (defn firebase-init
   []
   (firebase/initializeApp
@@ -123,11 +116,12 @@
  (fn [_ [_ token]]
    (js/console.log token)
    #_{}
-   {:fx [:dispatch
-         [::re-graph/init
-          {:ws nil #_{:url BACKEND_WS}
-           :http {:url BACKEND_HTTP
-                  :impl {:headers {"Access-Control-Allow-Credentials" true}}}}]]}))
+   {:fx [[:dispatch
+          [::re-graph/init
+           {:ws nil #_{:url BACKEND_WS}
+            :http {:url BACKEND_HTTP
+                   :impl {:headers {"Access-Control-Allow-Credentials" true
+                                    "Authorization" token}}}}]]]}))
 
 (defn ^:export init []
   (js/console.log (str "ENV" ENV))
