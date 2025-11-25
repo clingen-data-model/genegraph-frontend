@@ -52,6 +52,6 @@
     {:role "list",
      :class
      "divide-y divide-gray-100 overflow-hidden bg-white shadow-xs ring-1 ring-gray-900/5 sm:rounded-xl"}
-    (for [r (take 5 assertions)]
+    (for [r (take 100 assertions)]
       (assertion-div r))]
-   [:pre (with-out-str (cljs.pprint/pprint assertions))]])
+   #_[:pre (with-out-str (cljs.pprint/pprint assertions))]])

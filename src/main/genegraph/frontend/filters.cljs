@@ -76,6 +76,20 @@ query ($filters: [Filter]) {
  ::query-result
  :-> ::query-result)
 
+(def filters
+  {:proposition_type
+   {:type :radio
+    :label "Assertion Type"
+    :options [{:label "Variant Pathogenicity"
+               :description "CNV Variant Pathogenicity records from ClinVar"
+               :argument "CG:VariantPathogenicityProposition"}
+              {:label "Gene Validity"
+               :description "Gene Validity assertions from ClinGen and GenCC"
+               :argument "CG:GeneValidityProposition"}
+              {:label "Genetic Condition Mechanism"
+               :description "Genetic Condition Mechanism assertions from ClinGen Gene Dosage Curation"
+               :argument "CG:GeneticConditionMechanismProposition"}]}})
+
 (def queries
   [{:label "Deletions with >= 35 Genes"
     :description "Copy Number Loss variants in ClinVar that meet the criteria for Likely Pathogenic according to the ACMG guidelines based on gene count alone."
@@ -256,3 +270,5 @@ query ($filters: [Filter]) {
                  :argument "CG:VariantPathogenicityProposition"}
                 {:filter :has_annotation
                  :argument "CG:NoAssessment"}]}])
+
+

@@ -36,9 +36,19 @@
 (defn filter-div []
   (if-let [results @(rf/subscribe [::filters/query-result])]
     #_(display-results-div results)
+    
     [:div
+     [:div
+      {:class "border-b border-gray-200 px-4 py-5 sm:px-6 dark:border-white/10"}
+      [:h3
+       {:class "text-base font-semibold text-gray-900 dark:text-white"}
+       (count results)" results"]]
      (assertion-list/assertion-list-div results)
      [:div
-      {:on-click #(rf/dispatch [::filters/clear-query-result])}
-      "clear"]]
+      {:class "p-8"}
+      [:button
+       {:type "button"
+        :class "rounded-md bg-indigo-50 px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-xs hover:bg-indigo-100 dark:bg-indigo-500/20 dark:text-indigo-400 dark:shadow-none dark:hover:bg-indigo-500/30"
+        :on-click #(rf/dispatch [::filters/clear-query-result])}
+       "clear results"]]]
     (select-filter-div)))

@@ -15,6 +15,8 @@
             [genegraph.frontend.page.annotations :as annotations]
             [genegraph.frontend.page.conflict-list :as conflict-list]
             [genegraph.frontend.page.filter :as filter-page]
+            [genegraph.frontend.page.reports :as reports-page]
+            [genegraph.frontend.page.find :as find-page]
             [genegraph.frontend.filters :as filters-query]
             [genegraph.frontend.view :as view]
             [genegraph.frontend.components.search :as search]
@@ -169,6 +171,34 @@
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving filter page"))}]}]
+   ["reports"
+    {:name      :routes/reports
+     :view      reports-page/reports-div
+     :link-text "Reports"
+     :controllers
+     [{ ;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering reports page")
+                #_(re-frame/dispatch [::filters-query/clear-query-result])
+                #_(re-frame/dispatch [::home/request-conflict-list]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving reports page"))}]}]
+   ["find"
+    {:name      :routes/find
+     :view      find-page/find-div
+     :link-text "Find"
+     :controllers
+     [{ ;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering find page")
+                (re-frame/dispatch [::find-page/init])
+                #_(re-frame/dispatch [::home/request-conflict-list]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving find page"))}]}]
    ["gencc-home"
     {:name      :routes/gencc-home
      :view      gencc-home/home

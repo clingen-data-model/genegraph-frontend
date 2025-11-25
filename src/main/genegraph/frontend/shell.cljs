@@ -217,7 +217,17 @@
     :name "Filter"
     :icon icon/filter-icon
     :requires-authentication true
-    :active-on #{:routes/filter}}])
+    :active-on #{:routes/filter}}
+   {:route :routes/reports
+    :name "Reports"
+    :icon icon/chart-pie
+    :requires-authentication true
+    :active-on #{:routes/reports}}
+   {:route :routes/find
+    :name "find"
+    :icon icon/magnifying-glass
+    :requires-authentication true
+    :active-on #{:routes/find}}])
 
     (comment
         "Current: \"bg-gray-800 text-white\", Default: \"text-gray-400 hover:text-white hover:bg-gray-800\"")

@@ -59,6 +59,13 @@
          {:typename "CanonicalVariant" :detail-level 2}
          {:typename "EvidenceStrengthAssertion" :detail-level 1}}}
     1 {:fragment "{
+  __typename
+  curie
+  label
+  type {
+    curie
+    label
+  }
   assertions {
     curie
     iri
@@ -252,8 +259,20 @@
             label
           }
           overlappingFeatures {
-            curie
-            label
+            ...Resource1
+            assertions {
+              __typename
+              curie
+              label
+              type {
+                curie
+                label
+              }
+              evidenceStrength {
+                curie
+                label
+              }
+            }
           }
         }
 }"}}
@@ -268,6 +287,7 @@
     label
   }
 }"}}})
+"            ...SequenceFeature1"
 
 (defn fragment-str [{:keys [typename detail-level]}]
   (str "\nfragment "

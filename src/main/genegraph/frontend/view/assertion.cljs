@@ -5,9 +5,8 @@
             [genegraph.frontend.icon :as icon]
             [genegraph.frontend.common :as common]
             [genegraph.frontend.fragment.assertion-list :as assertion-list]
+            [genegraph.frontend.fragment.feature-list :as feature-list]
             [clojure.string :as str]))
-
-
 
 (defn approval-div [approval]
   [:div
@@ -293,7 +292,18 @@
         (contributions-div assertion)]
        (gene-validity-assertion-evidence-detail assertion)
        (versions assertion)]]
-     [:pre (with-out-str (cljs.pprint/pprint assertion))]]))
+     #_[:pre (with-out-str (cljs.pprint/pprint assertion))]]))
+
+(defn clinvar-button [assertion]
+  [:a
+   {:href (get-in assertion [:subject :variant :iri])
+    :target "_blank"}
+   [:button
+    {:type "button",
+     :class
+     "inline-flex items-center gap-x-1.5 rounded-md bg-indigo-100 px-2.5 py-1.5 text-sm font-semibold text-indigo-700 shadow-xs hover:bg-indigo-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"}
+    icon/link 
+    "ClinVar"]])
 
 (defn variant-path-header [assertion]
   [:header
@@ -308,12 +318,12 @@
        {:class "font-semibold text-lg"}
        (get-in assertion [:subject :variant :label])]
       #_[:div
-       [:div
-        {:class "font-normal"}
-        (:label disease)]
-       [:div
-        {:class "font-light text-gray-500"}
-        (:label moi)]]]
+         [:div
+          {:class "font-normal"}
+          (:label disease)]
+         [:div
+          {:class "font-light text-gray-500"}
+          (:label moi)]]]
      [:div
       {:class "text-right"}
       [:div
@@ -321,14 +331,31 @@
        (get-in assertion [:classification :label])]
       [:div
        {:class "text-sm/6 text-gray-500"}
-       (get-in assertion [:specifiedBy :label])]]]]])
+       (get-in assertion [:specifiedBy :label])]]]]
+   [:div
+    {:class "p-2"}
+    (clinvar-button assertion)]])
 
-(defn conflicts-div [])
+(defn overlapping-featuers-div [assertion]
+  (let [features (get-in assertion [:subject :variant :overlappingFeatures])
+        annotated-features (filter #(seq (:assertions %)) features)]
+    [:div
+     [:div
+      {:class "py-4"}
+      [:h3 {:class "font-semibold text-lg pt-4"}
+       (count annotated-features) " annotated features"]
+      [:p {:class "text-xs font-medium text-gray-500 dark:text-gray-400"}
+       (- (count features) (count annotated-features))" features without annotation"]]
+     (feature-list/feature-list-div annotated-features)]))
+
+
 
 (defn variant-pathogenicity-assertion [assertion]
   [:main
    {:class "px-4 sm:px-6 lg:px-8"}
    (variant-path-header assertion)
+   [:div (:description assertion)]
+   (overlapping-featuers-div assertion)
    [:div
     [:h3 {:class "font-semibold text-lg py-4"}
      "conflicting assertions"]
@@ -345,7 +372,7 @@
         (contributions-div assertion)]
        (gene-validity-assertion-evidence-detail assertion)
        (versions assertion)]]
-   [:pre (with-out-str (cljs.pprint/pprint assertion))]])
+   #_[:pre (with-out-str (cljs.pprint/pprint assertion))]])
 
 (defmethod common/main-view "EvidenceStrengthAssertion" [assertion]
   (case (get-in assertion [:subject :__typename])

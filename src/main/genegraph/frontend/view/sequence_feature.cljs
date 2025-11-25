@@ -203,7 +203,7 @@
                     (mapcat :assertions)
                     (map #(get-in % [:classification :curie]))
                     frequencies)]
-    [:pre (with-out-str (cljs.pprint/pprint counts))]))
+    #_[:pre (with-out-str (cljs.pprint/pprint counts))]))
 
 (defn overlapping-variants [label variants]
   (if (seq variants)
@@ -292,4 +292,4 @@
        (overlapping-variants "Overlapping Copy Number Gain"
                              (get grouped-variants "EFO:0030070"))
        [:div
-        [:pre (with-out-str (cljs.pprint/pprint feature))]]]))
+        #_[:pre (with-out-str (cljs.pprint/pprint feature))]]]))
