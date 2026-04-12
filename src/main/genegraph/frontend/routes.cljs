@@ -194,7 +194,7 @@
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :start (fn [& params]
                 (js/console.log "Entering find page")
-                (re-frame/dispatch [::find-page/init])
+                #_(re-frame/dispatch [::find-page/init])
                 #_(re-frame/dispatch [::home/request-conflict-list]))
        ;; Teardown can be done here.
        :stop  (fn [& params]

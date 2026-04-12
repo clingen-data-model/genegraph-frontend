@@ -23,8 +23,10 @@
 ")
 
 
+
+
 ;; Event to trigger the filters query
-(rf/reg-event-fx
+#_(rf/reg-event-fx
  ::fetch-filters
  (fn [_ _]
    (js/console.log "Requesting filter list")
@@ -56,6 +58,43 @@
  ::available-filters
  :-> ::available-filters)
 
+(def options-query "
+query ($query: String, $type: String, $limit: Int) {
+  textSearch(query: $query, type: $type, limit: $limit) {
+    __typename
+    iri
+    curie
+    label
+    type {
+      __typename
+      curie
+      label
+    }
+  }
+}
+")
+
+(rf/reg-event-fx
+ ::options-query
+ (fn [_ [_ element]]
+   (js/console.log "requesting options")
+   {:fx [[:dispatch
+          [::re-graph/query
+           {:id :filters-query
+            :query options-query
+            :variables (select-keys element [:query :type])
+            :callback [::return-options-query]}]]]}))
+
+(rf/reg-event-db
+ ::return-options-query
+ (fn [db [_ result]]
+   (js/console.log (str "returned options "))
+   (assoc db ::options result)))
+
+(rf/reg-sub
+ ::options
+ :-> ::options)
+
 (def filters
   {:proposition_type
    {:type :radio
@@ -68,8 +107,7 @@
                :id "CG:GeneValidityProposition"}
               {:label "Genetic Condition Mechanism"
                :description "Genetic Condition Mechanism assertions from ClinGen Gene Dosage Curation"
-               :id "CG:GeneticConditionMechanismProposition"}]}
-   })
+               :id "CG:GeneticConditionMechanismProposition"}]}})
 
 
 (rf/reg-event-fx
@@ -98,6 +136,12 @@
  ::set-filter
  (fn [db [_ {:keys [index]} new-filter]]
    (assoc-in db [::filters index] (assoc new-filter :index index))))
+
+(rf/reg-event-db
+ ::update-filter
+ (fn [db [_ filter]]
+   (js/console.log (str "update-filter " (:index filter)))
+   (assoc-in db [::filters (:index filter)] filter)))
 
 (defn radio-filter-div [filter]
   ;; why aren't any of the radio buttons below selectable?
@@ -130,11 +174,7 @@
          label]
         [:p
          {:class "text-gray-500 dark:text-gray-400"}
-         description]]])]]
-
-
-
-  )
+         description]]])]])
 
 (defn selected? [option filter]
   (= (:id option) (:argument filter)))
@@ -162,6 +202,31 @@
         {:class "text-sm/6 font-light text-gray-700"}
         (:description o)]]])])
 
+(defn select-element [filter]
+  [:div
+   [:input {:type "text"
+            :class "border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            :placeholder "Enter text here"
+            :on-change #_(js/console.log (.. % -target -value))
+            #(rf/dispatch [::options-query
+                           (assoc filter
+                                  :query (.. % -target -value)
+                                  :type "CG:Affiliation")])
+            :on-focus #(rf/dispatch [::update-filter (assoc filter :active true)])
+            :on-blur #(rf/dispatch [::update-filter (assoc filter :active false)])}]
+   [:div
+    {:class "absolute bg-white rounded-md shadow-lg py-1 z-50 min-w-[200px] overflow-hidden"}
+    [:div "item 1s"]
+    [:div "item 2"]]])
+
+(defn select-div [filter]
+  ^{:key filter}
+  [:ul
+   {:role "list"
+    :class "divide-y divide-gray-100 dark:divide-white/5 flex"}
+   [:div (:label filter)]
+   (select-element filter)])
+
 (defn default-display [filter]
   ^{:key filter}
   [:ul
@@ -182,12 +247,13 @@
         (:description f)]]])])
 
 (def filter->display
-  {:proposition_type radio-filter-div})
+  {:proposition_type radio-filter-div}) 
 
 (defn filter-div [filter]
   (case (:display filter)
     :radio (radio-filter-div filter)
     "list" (list-div filter)
+    "select" (select-div filter)
     (default-display filter)))
 
 (defn add-index [filter-list]
@@ -229,5 +295,8 @@
      (button "Run" #(rf/dispatch [::filters/send-query
                                   (prepare-filters-for-query filters)]))
      (button "Reset" #(rf/dispatch [::init]))
-     [:pre (with-out-str (cljs.pprint/pprint filters))]
-     [:pre (with-out-str (cljs.pprint/pprint @(rf/subscribe [::available-filters])))]]))
+     [:div
+      [:pre (with-out-str (cljs.pprint/pprint @(rf/subscribe [::options])))]
+      #_[:pre (with-out-str (cljs.pprint/pprint filters))]
+      #_[:pre (with-out-str (cljs.pprint/pprint @(rf/subscribe [::available-filters])))]
+      #_[:pre (with-out-str (cljs.pprint/pprint @(rf/subscribe [::filters/query-result])))]]]))
