@@ -54,7 +54,7 @@
           :class "text-sm/6 font-semibold text-gray-900 dark:text-white"}
          "Log out"
          [:span {:aria-hidden "true"} "→"]]]
-       (login-dropdown)
+       #_(login-dropdown) ;; disabled for now
        #_[:a
           {:on-click #(rf/dispatch [::show-auth])
            :class "text-sm/6 font-semibold text-gray-900 dark:text-white"}
