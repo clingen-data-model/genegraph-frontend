@@ -5,9 +5,35 @@
             [genegraph.frontend.icon :as icon]
             [clojure.string :as s]))
 
+;; gs://genegraph-stage-public/clingen-gene-validity-json-all.tar.gz
+;; gs://genegraph-stage-public/clingen-gene-validity-json-latest.tar.gz
+;; gs://genegraph-stage-public/clingen-gene-validity-nt-all.tar.gz
+;; gs://genegraph-stage-public/clingen-gene-validity-nt-latest.tar.gz
+
 (def download-set
   [{:title "Gene Validity -- Latest Versions"
-    :description "Includes only the most recent version of each curation."
+    :description "Includes only the most recent version of each curation. Based on a draft alignment with GA4GH GKS. The format of these will be expected to change slightly "
+    :files
+    [{:filename "clingen-gene-validity-json-latest.tar.gz"
+      :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-json-latest.tar.gz"
+      :format "json-ld"}
+     {:filename "clingen-gene-validity-nt-latest.tar.gz"
+      :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-nt-latest.tar.gz"
+      :format "n-triples"}]}
+   {:title "Gene Validity -- All Versions"
+    :description "Includes every published version for all curations."
+    :files
+    [{:filename "clingen-gene-validity-json-all.tar.gz"
+      :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-json-all.tar.gz"
+      :format "json-ld"}
+     {:filename "clingen-gene-validity-nt-all.tar.gz"
+      :url
+      "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-nt-all.tar.gz"
+      :format "n-triples"}]}])
+
+(def deprecated-download-set
+  [{:title "(Deprecated) Gene Validity -- Latest Versions"
+    :description "Based on an earlier version of the data model. Deprecated in favor of the more recent model."
     :files
     [{:filename "gene-validity-jsonld-latest.tar.gz"
       :url "https://storage.googleapis.com/genegraph-public/gene-validity-jsonld-latest.tar.gz"
@@ -15,7 +41,7 @@
      {:filename "gene-validity-nt-latest.tar.gz"
       :url "https://storage.googleapis.com/genegraph-public/gene-validity-nt-latest.tar.gz"
       :format "n-triples"}]}
-   {:title "Gene Validity -- All Versions"
+   {:title "(Deprecated) Gene Validity -- All Versions"
     :description "Includes every published version for all curations."
     :files
     [{:filename "gene-validity-jsonld-all.tar.gz"
@@ -70,6 +96,19 @@
        [:div
         {:class "pb-5"}
         [:h3 {:class "text-base font-semibold text-gray-900"}
+         (:title s)]
+        [:p
+         {:class "mt-2 max-w-4xl text-sm text-gray-500"}
+         (:description s)]
+        (download-list (:files s))]])]
+   [:ul
+    {:role "list", :class "py-10"}
+    (for [s deprecated-download-set]
+      ^{:key s}
+      [:li {:class "py-4"}
+       [:div
+        {:class "pb-5"}
+        [:h3 {:class "text-base font-semibold text-gray-500"}
          (:title s)]
         [:p
          {:class "mt-2 max-w-4xl text-sm text-gray-500"}

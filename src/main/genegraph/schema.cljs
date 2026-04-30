@@ -43,9 +43,9 @@
        :cg/review true
        :properties
        [:cg/feature :cg/mechanism :cg/condition :cg/assertions]}
-      :cg/EvidenceStrengthAssertion
+      :cg/Statement
       {:rdfs/label "Evidence Strength Assertion"
-       :dc/description "An assertion of the strength of evidence supporting a given proposition."
+       :dc/description "A statement linking the "
        :markup
        [:div
         {:class "flex flex-col gap-4"}
@@ -134,10 +134,10 @@
        [:cg/subject :cg/evidence :cg/classification :cg/contributions]}
       :cg/GeneValidityProposition
       {:rdfs/label "Gene Validity Proposition"
-       :dc/description "The proposition that variants affecting a gene are causative of a disease, given a mode of inheritance. Such variants are therefore valid to report to patients as pathogenic, given appropriate variant evaluation criteria."
+       :dc/description "The proposition that variants affecting a gene are causative of a disease, given a mode of inheritance. Such variants are therefore valid to report to patients as pathogenic, given appropriate variant evaluation criteria. The subject is the target gene, the object is the condition or disease this proposition relates to the subject, the qualifier is mode of inheritance in which the gene-disease relationship is considered valid."
        :rdfs/subClassOf :cg/Proposition
        :properties
-       [:cg/gene :cg/modeOfInheritance :cg/disease]}
+       [:cg/subject :cg/object :cg/predicate :cg/qualifier]}
       :cg/VariantObservation ;; Maybe want to use just Observation, FHIR style? Let's do that
       {:dc/description
        "A recorded instance of observing a specific genetic variant in a sample or individual."
@@ -225,7 +225,10 @@
                 "A point or period of time associated with an event in the lifecycle of the resource."
                 :type 'String}
       :cg/agent {:type :cg/Agent
-                 :dc/description "The agent associated with this contribution."}
+                 :dc/description "The agent associated with this contribution."
+                 :deprecated true}
+      :cg/contributor {:type :cg/Agent
+                       :dc/description "The agent associated with this contribution."}
       :cg/role {:type :owl/Class
                 :dc/description "The role performed by the agent making this contribution."
                 :domain :cg/ContributionSet}
