@@ -60,7 +60,7 @@
   [:div
    {:class "pt-4 max-w-4xl text-sm text-gray-700"}
    "The data model supporting ClinGen curations, and especially Gene Validity, is large, complex, and expanding. For a basic introduction starting with the documentation for "
-   (entity-ref :cg/EvidenceStrengthAssertion)
+   (entity-ref :cg/Statement)
    " is recommended."])
 
 (defn documentation []

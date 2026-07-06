@@ -9,8 +9,7 @@
   [re-graph "0.2.0"]
   [metosin/reitit-frontend "0.7.0"]]
 
- :dev-http {8080 "public"}
-
+ :dev-http #_{8080 "public"} {8080 {:root "public" :proxy-url "http://localhost:8888"}}
  :builds
  {:app
   {:target :browser

@@ -50,8 +50,8 @@
        [:div
         {:class "flex flex-col gap-4"}
         [:p
-         "An "
-         (entity :cg/EvidenceStrengthAssertion)
+         "A "
+         (entity :cg/Statement)
          " sits at the core of every ClinGen curation. It represents the assertion that a given Clinical Domain Working Group (CDWG) has found the evidence in support of the "
          (entity :cg/subject)
          " "
@@ -211,7 +211,7 @@
                       :dc/description "Relates a resource (for example a concept) to a concept scheme in which it is included."}
       :skos/member {:type '(list :rdfs/Resource)}
       :rdfs/subClassOf {:type '(list :owl/Class)}
-      :cg/assertions {:type '(list :cg/EvidenceStrengthAssertion)}
+      :cg/assertions {:type '(list :cg/Statement)}
       :cg/subject {:type :cg/Proposition
                    :dc/description "The subject of this entity, typically a Proposition or an Assertion."}
       :cg/annotations {:type '(list :cg/AssertionAnnotation)

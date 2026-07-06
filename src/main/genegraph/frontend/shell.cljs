@@ -10,9 +10,9 @@
             [clojure.string :as s]
             [genegraph.frontend.view.sequence-feature]
             [genegraph.frontend.view.assertion]
+            #_[genegraph.frontend.clerk :as clerk]
+            [genegraph.frontend.clerk-auth :as clerk-auth]
             [genegraph.frontend.auth :as auth]))
-
-
 
 
 (rf/reg-sub
@@ -444,6 +444,8 @@
    (comment "Profile dropdown")
    (profile-dropdown)])
 
+
+
 (defn shell []
   (let [search-active @(rf/subscribe [::search-active?])
         current-user @(rf/subscribe [::auth/current-user])]
@@ -463,9 +465,8 @@
         {:class "flex flex-1 gap-x-4 self-stretch lg:gap-x-6 bg-white"}
         (if current-user
           (search-form)
-          [:div])
-        #_(profile)]
-       (auth/login-header-div)]
+          [:div])]
+       (clerk-auth/login-header-div)]
       (if search-active
         (search/search-result-div)
         (main))      

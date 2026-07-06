@@ -15,15 +15,21 @@
             [genegraph.frontend.view :as view]
             ["firebase/app" :as firebase]
             ["firebase/auth" :as auth]
-            [genegraph.frontend.auth :as gg-auth]))
+            [genegraph.frontend.auth :as gg-auth]
+            [genegraph.frontend.clerk-auth :as clerk-auth]))
 
 (enable-console-print!)
 
 (defonce root (createRoot (gdom/getElement "app")))
 
 (goog-define BACKEND_WS "ws://localhost:8888/ws")
-(goog-define BACKEND_HTTP "http://localhost:8888/api")
+(goog-define BACKEND_HTTP #_"http://localhost:8888/api"
+             "/api")
 (goog-define ENV "dev")
+
+(goog-define CLERK_PUBLISHABLE_KEY
+             "pk_test_ZWFzeS1wYXJha2VldC02Ni5jbGVyay5hY2NvdW50cy5kZXYk"
+             #_"pk_live_Y2xlcmsuY2xpbmljYWxnZW5vbWUub3JnJA")
 
 (js/console.log (str ENV))
 
@@ -99,9 +105,21 @@
 
 (defn ^:dev/after-load render-root []
   (println "[main] reloaded lib:")
-  (routes/init-routes!)  
-  (.render root (reagent/as-element [routes/router-component
-                               {:router routes/router}])))
+  (routes/init-routes!)
+  (.render root
+           (reagent/as-element
+            [clerk-auth/clerk-provider
+             {:publishable-key CLERK_PUBLISHABLE_KEY}
+             [routes/router-component
+              {:router routes/router}]])))
+
+#_(defn ^:dev/after-load render-root []
+  (println "[main] reloaded lib:")
+  (routes/init-routes!)
+  (.render root
+           (reagent/as-element
+            [routes/router-component
+             {:router routes/router}])))
 
 (re-frame/reg-event-db
  ::initialize-firebase
