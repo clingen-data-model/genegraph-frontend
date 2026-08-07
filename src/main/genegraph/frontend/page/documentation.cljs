@@ -1,3 +1,4 @@
+;; Older documentation. Redoing for new schema--consider removing in future
 (ns genegraph.frontend.page.documentation
   (:require [re-frame.core :as rf]
             [re-graph.core :as re-graph]

@@ -45,7 +45,8 @@
        [:cg/feature :cg/mechanism :cg/condition :cg/assertions]}
       :cg/Statement
       {:rdfs/label "Evidence Strength Assertion"
-       :dc/description "A statement linking the "
+       :models [:cg/GeneDiseaseValidity]
+       :dc/description "A claim of purported truth as made by a particular agent, on a particular occasion. Statements may be used to simply put forth a possible fact (i.e. a 'proposition') as true, or to provide a more nuanced assessment of the level of confidence or evidence supporting a particular proposition."
        :markup
        [:div
         {:class "flex flex-col gap-4"}
@@ -108,19 +109,15 @@
         :cg/version]}
       :cg/Contribution
       {:dc/description "An action or set of actions performed by an agent toward the creation, modification, evaluation, or deprecation of an artifact."
+       :models [:cg/GeneDiseaseValidity]
        :properties
        [:cg/agent :dc/date :cg/role]}
       :cg/EvidenceLine ;; add to base
       {:dc/description "An evidence line represents an independent and meaningful argument for or against a particular proposition, that is based on the interpretation of one or more pieces of information as evidence."
+       :models [:cg/GeneDiseaseValidity]
        :skos/exactMatch "http://purl.obolibrary.org/obo/SEPIO_0000002"
        :properties
        [:cg/evidence :cg/strengthScore :cg/evidenceStrength]}
-      :cg/CanonicalVariant ;; Refactor around CatVRS? not right now
-      {:rdfs/label "Cannonical Allele"
-       :rdfs/subClassOf :cg/Resource
-       :dc/description "A concept encompassing all alleles that can be mapped to the given allele. May optionally include a set of alleleMappings of equivalent alleles. May also include a source for the set of mappings and associated identifier."
-       :properties
-       [:cg/allele :cg/alleleMappings]}
       :cg/VariantPathogenicityProposition
       {:rdfs/label "Variant Pathogenicity Proposition"
        :dc/description "The proposition that a given variant is causative of a given condition."
@@ -132,37 +129,36 @@
        :dc/description "Annotation on an assertion. May be used to annotate whether the person performing the annotation agrees with the assertion or not."
        :properties
        [:cg/subject :cg/evidence :cg/classification :cg/contributions]}
-      :cg/GeneValidityProposition
-      {:rdfs/label "Gene Validity Proposition"
+      :cg/GeneDiseaseValidityProposition
+      {:rdfs/label "Gene Disease Validity Proposition"
+       :models [:cg/GeneDiseaseValidity]
        :dc/description "The proposition that variants affecting a gene are causative of a disease, given a mode of inheritance. Such variants are therefore valid to report to patients as pathogenic, given appropriate variant evaluation criteria. The subject is the target gene, the object is the condition or disease this proposition relates to the subject, the qualifier is mode of inheritance in which the gene-disease relationship is considered valid."
        :rdfs/subClassOf :cg/Proposition
        :properties
        [:cg/subject :cg/object :cg/predicate :cg/qualifier]}
-      :cg/VariantObservation ;; Maybe want to use just Observation, FHIR style? Let's do that
+      :cg/VariantObservationStudyResult ;; Maybe want to use just Observation, FHIR style? Let's do that
       {:dc/description
        "A recorded instance of observing a specific genetic variant in a sample or individual."
+       :models [:cg/GeneDiseaseValidity]
        :properties
        [:cg/proband :cg/variant]}
-      :cg/Proband
+      :cg/ProbandStudyResult
       {:dc/description "The affected family member who seeks medical attention for a genetic disorder thereby bringing the family under study."
+       :models [:cg/GeneDiseaseValidity]
        :cg/note "There are other properties here that should be refactored to other parts of the model. Specifically, zygosity, genotyping_method, etc are part of variant detection."
        :properties
        [:cg/observations :cg/family :cg/phenotype]}
-      :cg/FunctionalAlteration
+      :gg/WhatIsThis
       {:dc/description "A change in protein or gene function caused by a genetic variant, affecting normal biological processes."
+       :models [:cg/GeneDiseaseValidity]
        :properties
        []
        :cg/note "Currently does not support properties beyond standard Resource properties"}
-      :cg/Affiliation ;; Can keep, but need to sort out the relationships with Agents, etc
-      {:dc/description "A ClinGen affiliation (such as a Gene Curation Expert Panel) is one of the groups responsible for producing ClinGen expert knowledge."
-       :rdfs/subClassOf :cg/Agent
-       :properties
-       []}
-      :cg/Finding
+      :cg/GeneFunctionStudyResult
       {:dc/description "A specific result, observation, or conclusion that emerges from systematic research or experimentation. It represents new knowledge or evidence discovered through the scientific process."
        :properties
        [:cg/demonstrates :cg/method :cg/statisticalSignificanceType :cg/statisticalSignificanceValue :cg/caseCohort :cg/controlCohort :cg/statisticalSignificanceValueType :cg/lowerConfidenceLimit :cg/upperConfidenceLimit :cg/pValue]}
-      :cg/FamilyCosegregation
+      :cg/SegregationStudyResult
       {:dc/description
        "Analysis of how genetic variants are inherited together within families to assess pathogenicity."
        :properties

@@ -209,10 +209,14 @@
     :name "Downloads"
     :icon icon/arrow-down-tray
     :active-on #{:routes/downloads}}
-   {:route :routes/documentation
+   #_{:route :routes/documentation
     :name "Documentation"
     :icon icon/book-open
     :active-on #{:routes/documentation :routes/documentation-term}}
+   {:route :routes/docs
+    :name "Docs"
+    :icon icon/book-open
+    :active-on #{:routes/docs}}
    {:route :routes/filter
     :name "Filter"
     :icon icon/filter-icon

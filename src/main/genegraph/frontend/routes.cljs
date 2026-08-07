@@ -8,6 +8,7 @@
             [genegraph.frontend.nav :as nav]
             [genegraph.frontend.page.home :as home]
             [genegraph.frontend.page.documentation :as documentation]
+            [genegraph.frontend.page.docs :as docs]
             [genegraph.frontend.page.downloads :as downloads]
             [genegraph.frontend.page.resource :as resource-page]
             [genegraph.frontend.page.gencc-home :as gencc-home]
@@ -108,10 +109,24 @@
        ;; Teardown can be done here.
        :stop  (fn [& params]
                 (js/console.log "Leaving downloads page"))}]}]
-   ["documenation"
+   #_["documenation"
     {:name      :routes/documentation
      :view      documentation/documentation
      :link-text "Documentation"
+     :controllers
+     [{;; Do whatever initialization needed for home page
+       ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
+       :start (fn [& params]
+                (js/console.log "Entering documentation page")
+                (re-frame/dispatch
+                 [::common/set-secondary-view nil]))
+       ;; Teardown can be done here.
+       :stop  (fn [& params]
+                (js/console.log "Leaving documentation page"))}]}]
+   ["docs"
+    {:name      :routes/docs
+     :view      docs/main
+     :link-text "Docs"
      :controllers
      [{;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
@@ -127,7 +142,7 @@
      :view      documentation/documentation-term
      :link-text "Documentation Term"
      :controllers
-     [{;; Do whatever initialization needed for home page
+     [{ ;; Do whatever initialization needed for home page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
        :parameters {:path [:id]}
        :start (fn [params]
