@@ -12,7 +12,7 @@
 
 (def download-set
   [{:title "Gene Validity -- Latest Versions"
-    :description "Includes only the most recent version of each curation. Based on a draft alignment with GA4GH GKS. The format of these will be expected to change slightly "
+    :description "These files include the latest version of each ClinGen Gene Disease Validity Curation. They include the evidence and the GCEP's assessment of each evidence item, modelled leveraging the GA4GH Genomic Knolwedge Model. Documentation is available for the data model. Two formats are available: JSON-LD, for those preferring to process JSON encoded data, and N-Triples, for those comfortable processing RDF. Both contain equivalent data."
     :files
     [{:filename "clingen-gene-validity-json-latest.tar.gz"
       :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-json-latest.tar.gz"
@@ -21,7 +21,7 @@
       :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-nt-latest.tar.gz"
       :format "n-triples"}]}
    {:title "Gene Validity -- All Versions"
-    :description "Includes every published version for all curations."
+    :description "These files include all of the data in the latest versions files, but also include previous versions of the ClinGen Gene Disease Validity Curations. These files would be of interest to those looking to see the historic record of curations. For those who simply want the current ClinGen Gene Disease Validity assessments, the latest versions file would be more appropriate."
     :files
     [{:filename "clingen-gene-validity-json-all.tar.gz"
       :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-json-all.tar.gz"
@@ -101,7 +101,7 @@
          {:class "mt-2 max-w-4xl text-sm text-gray-500"}
          (:description s)]
         (download-list (:files s))]])]
-   [:ul
+   #_[:ul
     {:role "list", :class "py-10"}
     (for [s deprecated-download-set]
       ^{:key s}

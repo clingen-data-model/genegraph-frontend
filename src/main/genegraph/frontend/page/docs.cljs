@@ -412,7 +412,7 @@
       [:h1
        {:class "text-2xl/7 font-bold text-gray-900 sm:text-3xl sm:tracking-tight"}
        "Documentation"]
-      [:label
+      #_[:label
        {:class "flex items-center gap-2 text-sm text-gray-500"}
        [:input
         {:type "checkbox"
