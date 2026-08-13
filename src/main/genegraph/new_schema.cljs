@@ -1,7 +1,7 @@
 (ns genegraph.new-schema)
 
 (def schema
-  [;; classes
+  [ ;; classes
  {:id :cg/Statement,
   :description "A claim of purported truth as made by a particular agent, on a particular occasion. Statements may be used to simply put forth a possible fact (i.e. a 'proposition') as true, or to provide a more nuanced assessment of the level of confidence or evidence supporting a particular proposition."
   :type :rdfs/Class
@@ -17,11 +17,12 @@
   :zeroOrOneOf [:cg/curationReasonDescription
                 :cg/curationReasons
                 :cg/GCISnapshot ;; one of, except when applied to other statements
-                :cg/calculatedClassification  ;; same
+                :cg/calculatedClassification ;; same
                 :cg/score
                 :cg/sequence
                 :dc/isVersionOf]
-  :zeroOrMoreOf [:cg/hasEvidenceLines]}
+  :zeroOrMoreOf [:cg/hasEvidenceLines
+                 :cg/unusedReferences]}
  {:id :cg/GeneFunctionStudyResult,
   :description "The result of an experimental study of gene function,
       curated as gene-level experimental evidence. Only evidence supporting
@@ -35,7 +36,7 @@
           :rdfs/label
           :dc/source]
   :zeroOrOneOf [:cg/modelSystem
-                :dc/description] ; 124 without a description
+                :dc/description]        ; 124 without a description
   }
  {:id :cg/GeneDiseaseValidityProposition,
   :description "The proposition that variation in a given gene causes a given
@@ -44,7 +45,7 @@
   :maturity :cg/Draft
   :oneOf [:cg/predicate
           :cg/modeOfInheritanceQualifier
-          :cg/objectCondition ; 2 with doubled conditions
+          :cg/objectCondition           ; 2 with doubled conditions
           :cg/subjectGene]}
  {:id :cg/CaseControlStudyResult,
   :description "The result of a study in which statistical analysis is used
@@ -106,7 +107,7 @@
           :cg/numberGenotyped
           :cg/numberWithVariant]
   :zeroOrOneOf [:cg/detectionMethodText
-                :cg/alleleFrequency ; only 43 without
+                :cg/alleleFrequency     ; only 43 without
                 :cg/relatedCondition] ; may want to make this one or more 
   }
  {:id :cg/UnscoreableEvidence
@@ -162,9 +163,9 @@
   :maturity :cg/Volatile
   :description "A reference to a variant."
   :note "The GA4GH used to have a similar concept. This was removed from the spec but has not yet been replaced by an equivalent term."
-  :zeroOrOneOf [:skos/prefLabel] ;6 w/o
+  :zeroOrOneOf [:skos/prefLabel]        ;6 w/o
   :oneOf [:rdf/type
-          :cg/canonicalReference]} ; 197 w/o -- should invesitigate.
+          :cg/canonicalReference]}   ; 197 w/o -- should invesitigate.
  {:id :cg/ProbandStudyResult
   :description "Case-level evidence describing a single proband: the
       variants identified, the phenotype documented, and the prior testing
@@ -211,10 +212,15 @@
           :cg/functionalDataSupport
           :dc/description]}
  ;; properties
+ {:id :cg/unusedReferences
+  :type :rdf/Property
+  :maturity :cg/Internal
+  :range :cg/Resource
+  :description "References noted by the curator but not used in making the final classification. Typically the reason the references were unused will be noted; often they contain information that cannot be used when the relevant curation SOP is applied."}
  {:id :cg/GCISnapshot,
   :type :rdf/Property
   :maturity :cg/Internal
-  :range :String}
+  :range :cg/Resource}
  {:id :cg/activityType,
   :type :rdf/Property
   :reference :sepio/activityType
@@ -336,7 +342,7 @@
   :maturity :cg/Internal}
  {:id :cg/date,
   :type :rdf/Property
-  :range :cg/String
+  :range :String
   :note "Expect ISO-8601 DateTime"
   :reference :sepio/date
   :description "The date that the Activity was completed."}
@@ -930,9 +936,9 @@
       investigate a linkage interval."
   :type :skos/Collection
   :skos/member [:cg/SingleVariantAnalysis
-                  :cg/AggregateVariantAnalysis
-                  :cg/CandidateGeneSequencing
-                  :cg/AllGenesSequencing]}
+                :cg/AggregateVariantAnalysis
+                :cg/CandidateGeneSequencing
+                :cg/AllGenesSequencing]}
  {:id :cg/ModelSystemValueSet,
   :description "The systems in which a functional alteration experiment may
       be conducted."
@@ -1449,4 +1455,5 @@
       opposite alleles, for example where parental testing was completed but
       phase was not established directly."
   :type :skos/Concept}
- ])
+ ]
+  )

@@ -11,7 +11,7 @@
 ;; gs://genegraph-stage-public/clingen-gene-validity-nt-latest.tar.gz
 
 (def download-set
-  [{:title "Gene Validity -- Latest Versions"
+  [{:title "Gene Disease Validity -- Latest Versions"
     :description "These files include the latest version of each ClinGen Gene Disease Validity Curation. They include the evidence and the GCEP's assessment of each evidence item, modelled leveraging the GA4GH Genomic Knolwedge Model. Documentation is available for the data model. Two formats are available: JSON-LD, for those preferring to process JSON encoded data, and N-Triples, for those comfortable processing RDF. Both contain equivalent data."
     :files
     [{:filename "clingen-gene-validity-json-latest.tar.gz"
@@ -20,7 +20,7 @@
      {:filename "clingen-gene-validity-nt-latest.tar.gz"
       :url "https://storage.googleapis.com/genegraph-stage-public/clingen-gene-validity-nt-latest.tar.gz"
       :format "n-triples"}]}
-   {:title "Gene Validity -- All Versions"
+   {:title "Gene Disease Validity -- All Versions"
     :description "These files include all of the data in the latest versions files, but also include previous versions of the ClinGen Gene Disease Validity Curations. These files would be of interest to those looking to see the historic record of curations. For those who simply want the current ClinGen Gene Disease Validity assessments, the latest versions file would be more appropriate."
     :files
     [{:filename "clingen-gene-validity-json-all.tar.gz"
@@ -87,7 +87,7 @@
      "Downloads"]
     [:p
      {:class "mt-4 max-w-4xl text-sm text-gray-700"}
-     "All downloads are generated every six hours using the most recent published data from ClinGen. They are made available in JSON-LD and RDF n-triples formats, compressed into an archive package."]]
+     "Data included in downloads are derived from evidence documented from ClinGen biocurators in the Gene Curation Interface from the cited sources. This data may include more information than is available on the clinicalgenome.org website.  All downloads are generated every six hours using the most recent published data from ClinGen. They are made available in JSON-LD and RDF n-triples formats, compressed into an archive package."]]
    [:ul
     {:role "list", :class "py-10"}
     (for [s download-set]
