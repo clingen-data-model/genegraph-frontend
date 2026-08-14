@@ -1164,7 +1164,9 @@
       a monoallelic mode of inheritance. De novo status requires that
       appropriately tested parents do not carry the variant."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria11, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria11
+  :type :skos/Concept
+  :description "Version 11 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityOverallExperimentalEvidenceCriteria,
   :description "The total experimental evidence score for the gene-disease
       relationship, capped at 6 points regardless of the individual category
@@ -1178,34 +1180,28 @@
       demonstrated functional impact."
   :type :skos/Concept}
  {:id :cg/GeneValidityPatientCellRescueCriteria,
-  :description "Criteria for scoring evidence that the phenotype can be
-      rescued in patient cells. Default 1 point, range 0-2."
+  :description "Criteria for scoring in the Functional Alteration – Patient Cells category of experimental data.  The evidence should demonstrate that the phenotype can be rescued in patient cells. Default 1 point, range 0-2."
   :type :skos/Concept}
  {:id :cg/GeneValidityOverallFunctionalEvidenceCriteria,
-  :description "The combined score for the gene function category,
-      comprising biochemical function, protein interaction, and expression
-      evidence, capped at 2 points."
+  :description "The combined score for the Experimental Evidence category Function, comprising biochemical function, protein interaction, and expression evidence, capped at 2 points."
   :type :skos/Concept}
  {:id :cg/GeneValidityBiochemicalFunctionCriteria,
-  :description "Criteria for scoring evidence that the gene product performs
-      a biochemical function shared with other genes known to cause the
-      disease, or consistent with the phenotype. Default 0.5 points, range
-      0-2."
+  :description "Criteria for scoring in the Function – Biochemical Function category of experimental evidence. The evidence should demonstrate that the gene product performs a biochemical function shared with other genes known to cause the disease, or consistent with the phenotype. Default 0.5 points, range 0-2."
   :type :skos/Concept}
- {:id :cg/GeneValidityUncategorizedProbandCriteria,
-  :type :skos/Concept}
- {:id :cg/GeneValidityCriteria8, :type :skos/Concept}
+ {:id :cg/GeneValidityUncategorizedProbandCriteria
+  :type :skos/Concept
+  :description "Too little is known about the provennance of the variant in the guidelines to properly classify the proband. This evidence should be assigned a score of 0."}
+ {:id :cg/GeneValidityCriteria8
+  :type :skos/Concept
+  :description "Version 8 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityProteinInteractionCriteria,
-  :description "Criteria for scoring evidence that the gene product
-      interacts with proteins previously implicated in the disease of
-      interest, demonstrated experimentally rather than predicted. Default
-      0.5 points, range 0-2."
+  :description "Criteria for scoring in the Function – Protein Interaction category of experimental evidence.  The evidence should demonstrate that the gene product interacts with proteins previously implicated in the disease of interest, demonstrated experimentally rather than predicted. Default 0.5 points, range 0-2."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria6, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria6
+  :type :skos/Concept
+  :description "Version 6 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityNonHumanModelOrganismCriteria,
-  :description "Criteria for scoring evidence that a non-human model
-      organism with a disrupted copy of the gene shows a phenotype
-      consistent with the human disease state. Default 2 points, range 0-4."
+  :description "Criteria for scoring in the Models – Non-human model organism category of experimental evidence.  The evidence should demonstrate that a non-human model organism with a disrupted copy of the gene shows a phenotype consistent with the human disease state. Default 2 points, range 0-4."
   :type :skos/Concept}
  {:id
   :cg/GeneValidityOverallAutosomalDominantDeNovoVariantEvidenceCriteria,
@@ -1222,26 +1218,26 @@
       proband, which may not exceed 3 points."
   :type :skos/Concept}
  {:id :cg/GeneValiditySegregationEvidenceCriteria,
-  :description "The score contributed by segregation evidence, assigned from
-      the LOD score summed across all qualifying families and the sequencing
-      method used to investigate the linkage interval."
+  :description "The score contributed by segregation evidence, assigned from the LOD score summed across all qualifying families and the sequencing method used to investigate the linkage interval. Capped at 3 points."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria10, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria10,
+  :type :skos/Concept
+  :description "Version 10 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityCellCultureRescueCriteria,
-  :description "Criteria for scoring evidence that the phenotype can be
-      rescued in a cell culture model engineered to express the variant of
-      interest. Default 1 point, range 0-2."
+  :description "Criteria for scoring in the Rescue – Rescue in cell culture model category of experimental evidence.  The evidence should demonstrate that the phenotype can be rescued in a cell culture model engineered to express the variant of interest. Default 1 point, range 0-2."
   :type :skos/Concept}
  {:id :cg/GeneValidityOverallFunctionalAlterationEvidenceCriteria,
-  :description "The combined score for functional alteration evidence in
-      patient and non-patient cells, capped at 2 points."
+  :description "The combined score for the “Functional alteration” category of experimental evidence, comprising evidence from patient and non-patient cells, capped at 2 points."
   :type :skos/Concept}
  {:id :cg/GeneValidityNonHumanRescueCriteria,
-  :description "Criteria for scoring evidence that the phenotype can be
-      rescued in a non-human model organism. Default 2 points, range 0-4."
+  :description "Criteria for scoring in the Rescue – Rescue in non-human model organism category of experimental evidence. The evidence that the phenotype can be rescued in a non-human model organism. Default 2 points, range 0-4."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria5, :type :skos/Concept}
- {:id :cg/GeneValidityCriteria9, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria5,
+  :type :skos/Concept
+  :description "Version 5 of the ClinGen Gene Disease Validity SOP"}
+ {:id :cg/GeneValidityCriteria9
+  :type :skos/Concept
+  :description "Version 9 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityNullVariantCriteria,
   :description "Criteria for scoring a predicted or proven null variant, a
       category including nonsense, frameshift, canonical splice site
@@ -1250,13 +1246,10 @@
       product is still made."
   :type :skos/Concept}
  {:id :cg/GeneValidityHumanRescueCriteria,
-  :description "Criteria for scoring evidence that the disease phenotype can
-      be rescued in humans, for example by successful enzyme replacement
-      therapy. Default 2 points, range 0-4."
+  :description "Criteria for scoring in the Rescue – Rescue in Human category of experimental evidence. The evidence should demonstrate that the disease phenotype can be rescued in humans, for example by successful enzyme replacement therapy. Default 2 points, range 0-4."
   :type :skos/Concept}
  {:id :cg/GeneValidityOverallModelAndRescueEvidenceCriteria,
-  :description "The combined score for model system and rescue evidence,
-      capped at 4 points."
+  :description "The combined score for the Models and Rescue category of experimental evidence, comprised of evidence from the model system and/or rescue sub-categories, capped at 4 points."
   :type :skos/Concept}
  {:id
   :cg/GeneValidityOverallAutosomalDominantOtherVariantEvidenceCriteria,
@@ -1268,31 +1261,27 @@
   :description "Criteria for scoring a proband with a de novo null variant
       under a biallelic mode of inheritance."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria12, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria12
+  :type :skos/Concept
+  :description "Version 12 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityPatientCellFunctionalAlterationCriteria,
-  :description "Criteria for scoring evidence that patient cells in which
-      gene function is disrupted show a phenotype consistent with the human
-      disease process. Default 1 point, range 0-2."
+  :description "Criteria for scoring in the Functional Alteration – Patient Cells category of experimental evidence. The evidence should demonstrate that patient cells (in which gene function is disrupted) show a phenotype consistent with the human disease process. Default 1 point, range 0-2."
   :type :skos/Concept}
  {:id :cg/GeneValidityGeneExpressionCriteria,
-  :description "Criteria for scoring evidence that the gene is expressed in
-      tissues relevant to the disease or altered in expression in affected
-      individuals. Default 0.5 points, range 0-2."
+  :description "Criteria for scoring in the Function – Expression category of experimental evidence.  The evidence should demonstrate that the gene is expressed in tissues relevant to the disease or altered in expression in affected individuals. Default 0.5 points, range 0-2."
   :type :skos/Concept}
  {:id :cg/GeneValidityOverallCaseControlEvidenceCriteria,
   :description "The total score contributed by case-control studies, each
       assessed at 0-6 points, capped at 12 points for the category."
   :type :skos/Concept}
  {:id :cg/GeneValidityCellCultureModelOrganismCriteria,
-  :description "Criteria for scoring evidence that a cell culture model with
-      a disrupted copy of the gene shows a phenotype consistent with the
-      human disease state. Default 1 point, range 0-2."
+  :description "Criteria for scoring evidence in the Models – Cell Culture Model” category of experimental evidence.  The evidence should demonstrate that a cell culture model with a disrupted copy of the gene shows a phenotype consistent with the human disease state. Default 1 point, range 0-2."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria4, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria4,
+  :type :skos/Concept
+  :description "Version 4 of the ClinGen Gene Disease Validity SOP"}
  {:id :cg/GeneValidityNonPatientCellFunctionalAlterationCriteria,
-  :description "Criteria for scoring evidence that non-patient cultured
-      cells in which gene function is disrupted show a phenotype consistent
-      with the human disease process. Default 0.5 points, range 0-1."
+  :description "Criteria for scoring in the Functional Alteration – Non-patient cells category of experimental evidence.  The evidence should demonstrate that non-patient cultured cells in which gene function is disrupted show a phenotype consistent with the human disease process. Default 0.5 points, range 0-1."
   :type :skos/Concept}
  {:id :cg/GeneValidityProbandADNonNullCriteria,
   :description "Criteria for scoring a proband with a non-null variant with
@@ -1302,7 +1291,9 @@
   :description "Criteria for scoring a proband with a predicted or proven
       null variant under a monoallelic mode of inheritance."
   :type :skos/Concept}
- {:id :cg/GeneValidityCriteria7, :type :skos/Concept}
+ {:id :cg/GeneValidityCriteria7
+  :type :skos/Concept
+  :description "Version 7 of the ClinGen Gene Disease Validity SOP"}
  {:id
   :cg/GeneValidityOverallAutosomalDominantNullVariantEvidenceCriteria,
   :description "The aggregate score contributed by predicted or proven null
@@ -1455,5 +1446,4 @@
       opposite alleles, for example where parental testing was completed but
       phase was not established directly."
   :type :skos/Concept}
- ]
-  )
+ ] )
