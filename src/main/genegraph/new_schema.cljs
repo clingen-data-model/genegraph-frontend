@@ -220,7 +220,8 @@
  {:id :cg/GCISnapshot,
   :type :rdf/Property
   :maturity :cg/Internal
-  :range :cg/Resource}
+  :range :cg/Resource
+  :description "Reference to an internal identifier used by the Gene Curation Interface. Not recommended for external use."}
  {:id :cg/activityType,
   :type :rdf/Property
   :reference :sepio/activityType
@@ -231,6 +232,7 @@
   :type :rdf/Property
   :maturity :cg/Volatile
   :note "Age and duration units have yet to be aligned at GA4GH level; will adjust to conform to standard as it is developed."
+  :description "Type of age noted for individual (birth, gestational, etc.)."
   :range :skos/Concept
   :value-set :cg/AgeTypeValueSet}
  {:id :cg/ageUnit
@@ -238,11 +240,13 @@
   :maturity :cg/Volatile
   :range :skos/Concept
   :value-set :cg/AgeUnitValueSet
+  :description "Unit of measure for age value on individual (days, months, years)."
   :note "Age and duration units have yet to be aligned at GA4GH level; will adjust to conform to standard as it is developed."}
  {:id :cg/ageValue
   :type :rdf/Property
   :maturity :cg/Volatile
   :range :Number
+  :description "Age of individual, units specified by ageUnit."
   :note "Age and duration units have yet to be aligned at GA4GH level; will adjust to conform to standard as it is developed."}
  {:id :cg/numberGenotyped
   :description "The total number of individuals in the cohort who were
@@ -295,7 +299,8 @@
  {:id :cg/canonicalReference,
   :type :rdf/Property
   :maturity :cg/Volatile
-  :range :cg/Variation
+  :range :cg/Resource
+  :description "Reference to the canonical identifier for the variant, such as a ClinVar Variation ID."
   :internal-note "only used as ID, consider ways to mark ID only fields in model."
   :note "Part of Variant Descriptor, currently looking for a replacement in GA4GH"}
  {:id :cg/caseCohort,
@@ -516,6 +521,7 @@
   :type :rdf/Property
   :range :cg/ProbandStudyResult
   :maturity :cg/Draft
+  :description "A proband a given variant has been observed in."
   :note "Inverse of hasVariant, attribute of VariantObservationStudyResult"}
  {:id :cg/pValue,
   :description "The p-value reported for the comparison between cases and
@@ -722,6 +728,7 @@
   :type :rdf/Property
   :maturity :cg/Draft
   :range :String
+  :description "Description of the given entity."
   :internal-note "Used everywhere in our model, but am deriving this from Dublin Core rather than SEPIO. Will probably leave for now."
   :tag #{:cg/Meta}}
  {:id :dc/isVersionOf,
@@ -729,28 +736,33 @@
   :maturity :cg/Draft
   :range :cg/Resource
   :json-type :String
+  :description "Reference to the resource identifier for a resource that may contain many different versions. For example, the Gene Disease Validity record for a given gene, disease, and a mode of inheritance would be denoted by this identifier, while the curation for this at a point in time would recieve a different identifier with a reference to this."
   :internal-note "This is needed as part of a provennance scheme, used to refer to a parent record that may have several (immutable) versions. Also haven't defined the type of Ur-records yet "
   :tag #{:cg/Meta}}
  {:id :dc/source,
   :type :rdf/Property
   :maturity :cg/Draft
   :range :cg/Resource
+  :description "The source of a given entity, frequently a journal article, or a ClinVar record."
   :json-type :String
   :tag #{:cg/Meta}}
  {:id :rdf/type,
   :type :rdf/Property
   :maturity :cg/Draft
   :range :rdfs/Class
+  :description "Attribute that states the resource is a type of a Class."
   :tag #{:cg/Meta}}
  {:id :rdfs/label,
   :type :rdf/Property
   :maturity :cg/Draft
   :range :String
+  :description "Human readable version of a given resource's name."
   :tag #{:cg/Meta}}
  {:id :skos/prefLabel,
   :type :rdf/Property
   :maturity :cg/Draft
   :range :String
+  :description "Preferred human readable label for a given resource."
   :tag #{:cg/Meta}}
  ;; Value Sets
  {:id :cg/ActivityTypeValueSet,
@@ -838,6 +850,7 @@
    :cg/Male
    :cg/Female
    :cg/TransMale
+   :cg/TransFemale
    :cg/Intersex]}
  {:id :cg/SpecifiedByValueSet,
   :description "The criteria from the Gene-Disease Validity SOP under which
@@ -956,14 +969,17 @@
       proposition."
   :type :skos/Collection
   :skos/member [:cg/Neutral :cg/Supports]}
- {:id :cg/Evaluated, :type :skos/Concept}
+ {:id :cg/Evaluated,
+  :type :skos/Concept
+  :description "The classification was evaluated by the curator. In ClinGen Gene Disease Validity, this refers to the date when the literature was evaluated and the classification made."}
  {:id :cg/Approved,
   :description "The classification was approved by the expert panel."
   :type :skos/Concept}
- {:id :cg/Submitted, :type :skos/Concept}
+ {:id :cg/Submitted,
+  :type :skos/Concept
+  :description "The classification was submitted for publication."}
  {:id :cg/AgeAtReport,
-  :description "The recorded age refers to the age of the individual at the
-      time of the report."
+  :description "The recorded age refers to the age of the individual at the time of the report."
   :type :skos/Concept}
  {:id :cg/AgeAtOnset,
   :description "The recorded age refers to the age at onset of the
@@ -976,23 +992,37 @@
   :description "The recorded age refers to the age at which the diagnosis
       was made."
   :type :skos/Concept}
- {:id :cg/Months, :type :skos/Concept}
+ {:id :cg/Months,
+  :type :skos/Concept
+  :description "Time in months."}
  {:id :cg/WeeksGestation,
   :description "Age expressed in weeks of gestation, for ages recorded
       before birth."
   :type :skos/Concept}
- {:id :cg/Days, :type :skos/Concept}
- {:id :cg/Hours, :type :skos/Concept}
- {:id :cg/Weeks, :type :skos/Concept}
- {:id :cg/Years, :type :skos/Concept}
+ {:id :cg/Days,
+  :type :skos/Concept
+  :description "Time in days."}
+ {:id :cg/Hours,
+  :type :skos/Concept
+  :description "Time in hours."}
+ {:id :cg/Weeks,
+  :type :skos/Concept
+  :description "Time in weeks."}
+ {:id :cg/Years,
+  :type :skos/Concept
+  :description "Time in years"}
  {:id :cg/DeNovoAlleleOrigin,
   :description "The allele arose de novo: it is present in the affected
       individual but absent from appropriately tested parents, or a parent
       carries it mosaically. Postzygotic mosaicism is also treated as a de
       novo occurrence."
   :type :skos/Concept}
- {:id :cg/AlleleOrigin, :type :skos/Concept}
- {:id :cg/GermlineAlleleOrigin, :type :skos/Concept}
+ {:id :cg/AlleleOrigin,
+  :type :skos/Concept
+  :description "Allele origin not specified to a specific concept. In ClinGen Gene Disease Validity used when the origin is unknown."}
+ {:id :cg/GermlineAlleleOrigin,
+  :type :skos/Concept
+  :description "The allele is present in one or more appropriately tested parents."}
  {:id :cg/Limited,
   :description "The gene-disease relationship is considered plausible by
       experts but the evidence is insufficient to score as Moderate, for
@@ -1122,7 +1152,9 @@
   :description "The gene-disease relationship is being published for the
       first time."
   :type :skos/Concept}
- {:id :cg/Neutral, :type :skos/Concept}
+ {:id :cg/Neutral,
+  :type :skos/Concept
+  :description "The evidence is neutral with respect to the proposition."}
  {:id :cg/Supports,
   :description "The evidence supports the proposition."
   :type :skos/Concept}
@@ -1132,7 +1164,9 @@
       cannot be assigned a score but is flagged as contradictory evidence
       for expert review."
   :type :skos/Concept}
- {:id :cg/Neutral, :type :skos/Concept}
+ {:id :cg/Neutral,
+  :type :skos/Concept
+  :description "The evidence is neutral with respect to the proposition."}
  {:id :cg/Supports,
   :description "The evidence supports the proposition."
   :type :skos/Concept}
@@ -1148,17 +1182,30 @@
   :description "The individual or cohort is reported as Hispanic or Latino.
       Ethnicity is recorded separately from race in the curation interface."
   :type :skos/Concept}
- {:id :cg/AmbiguousSex, :type :skos/Concept}
+ {:id :cg/AmbiguousSex,
+  :type :skos/Concept
+  :description "The biological sex of the individual is ambiguous."}
  {:id :cg/Unknown,
   :description "No value was reported in the source publication."
   :type :skos/Concept}
  {:id :cg/Other,
   :description "A value not covered by the other options in the set."
   :type :skos/Concept}
- {:id :cg/Male, :type :skos/Concept}
- {:id :cg/Female, :type :skos/Concept}
- {:id :cg/TransMale, :type :skos/Concept}
- {:id :cg/Intersex, :type :skos/Concept}
+ {:id :cg/Male,
+  :type :skos/Concept
+  :description "The biological sex of the individual is male."}
+ {:id :cg/Female
+ :type :skos/Concept
+  :description "The biological sex of the individual is female."}
+ {:id :cg/TransMale
+  :type :skos/Concept
+  :description "The biological sex of the individual is female. The individual identifies as male."}
+ {:id :cg/TransFemale
+  :type :skos/Concept
+  :description "The biological sex of the individual is male The individual identifies as female."}
+ {:id :cg/Intersex
+  :type :skos/Concept
+  :description "An individual with both male and female sexual traits and organs."}
  {:id :cg/GeneValidityProbandADDeNovoCriteria,
   :description "Criteria for scoring a proband with a de novo variant under
       a monoallelic mode of inheritance. De novo status requires that
@@ -1315,29 +1362,69 @@
       enrichment in cases compared to controls. Assigned 0-6 points on study
       quality."
   :type :skos/Concept}
- {:id :cg/Homozygous, :type :skos/Concept}
- {:id :cg/BiallelicCompoundHeterozygous, :type :skos/Concept}
- {:id :cg/Heterozygous, :type :skos/Concept}
- {:id :cg/Hemizygous, :type :skos/Concept}
- {:id :cg/MonoallelicHeterozygous, :type :skos/Concept}
- {:id :cg/TwoVariantsInTrans, :type :skos/Concept}
- {:id :cg/BiallelicHomozygous, :type :skos/Concept}
- {:id :cg/GenePanels, :type :skos/Concept}
- {:id :cg/SangerSequencing, :type :skos/Concept}
- {:id :cg/ChromosomalMicroarray, :type :skos/Concept}
- {:id :cg/RestrictionDigest, :type :skos/Concept}
- {:id :cg/Genotyping, :type :skos/Concept}
- {:id :cg/SSCP, :type :skos/Concept}
- {:id :cg/ExomeSequencing, :type :skos/Concept}
- {:id :cg/LinkageAnalysis, :type :skos/Concept}
+ {:id :cg/Homozygous,
+  :type :skos/Concept
+  :description "The same allele is present on both copies of the locus in the proband."}
+ {:id :cg/BiallelicCompoundHeterozygous,
+  :type :skos/Concept
+  :description "A biallelic (recessive) requirement satisfied by two different variants, one on each allele."}
+ {:id :cg/Heterozygous,
+  :type :skos/Concept
+  :description "Two different alleles at the locus; the variant of interest is present on one of the two copies."}
+ {:id :cg/Hemizygous,
+  :type :skos/Concept
+  :description "Only one copy of the locus is present, so the variant is unpaired — typically an X- or Y-linked locus in a 46,XY individual, or a locus where the homologous copy is deleted."}
+ {:id :cg/MonoallelicHeterozygous,
+  :type :skos/Concept
+  :description "A biallelic (recessive) requirement satisfied by a different variant on both alleles."}
+ {:id :cg/TwoVariantsInTrans,
+  :type :skos/Concept
+  :description "Two variants demonstrated, by phasing or parental testing, to lie on opposite copies of the locus."}
+ {:id :cg/BiallelicHomozygous,
+  :type :skos/Concept
+  :description "A biallelic (recessive) requirement satisfied by the same variant on both alleles."}
+ {:id :cg/GenePanels,
+  :type :skos/Concept
+  :description "Targeted next-generation sequencing of a predefined set of disease-relevant genes."}
+ {:id :cg/SangerSequencing
+  :type :skos/Concept
+  :description "Dideoxy chain-termination capillary sequencing of a specific amplicon; a confirmatory standard for single variants."}
+ {:id :cg/ChromosomalMicroarray,
+  :type :skos/Concept
+  :description "Array CGH or SNP array assay of copy-number changes genome-wide; detects imbalances and, for SNP arrays, regions of homozygosity."}
+ {:id :cg/RestrictionDigest,
+  :type :skos/Concept
+  :description "Restriction fragment length polymorphism analysis, where a variant creates or destroys an enzyme recognition site and is scored by fragment size."}
+ {:id :cg/Genotyping,
+  :type :skos/Concept
+  :description "Assay of specific known variants at defined positions rather than discovery of novel ones — TaqMan, mass spectrometry, or SNP array platforms."}
+ {:id :cg/SSCP,
+  :type :skos/Concept
+  :description "Single-strand conformation polymorphism analysis; screens amplicons for unknown variants via sequence-dependent mobility shifts of single-stranded DNA on a non-denaturing gel."}
+ {:id :cg/ExomeSequencing
+ :type :skos/Concept
+  :description "Capture-based next-generation sequencing of protein-coding regions and flanking splice sites."}
+ {:id :cg/LinkageAnalysis,
+  :type :skos/Concept
+  :description "Statistical analysis of co-segregation between marker loci and phenotype across families; localizes a disease locus rather than identifying a causal variant."}
  {:id :cg/Other,
   :description "A value not covered by the other options in the set."
   :type :skos/Concept}
- {:id :cg/PCR, :type :skos/Concept}
- {:id :cg/WholeGenomeSequencing, :type :skos/Concept}
- {:id :cg/DenaturingGradientGel, :type :skos/Concept}
- {:id :cg/HomozygosityMapping, :type :skos/Concept}
- {:id :cg/HighResolutionMelting, :type :skos/Concept}
+ {:id :cg/PCR,
+  :type :skos/Concept
+  :description "Targeted amplification of a genomic region; used on its own for sizing assays such as repeat expansions or deletion detection, and as a prerequisite step for most other targeted methods."}
+ {:id :cg/WholeGenomeSequencing,
+  :type :skos/Concept
+  :description "Next-generation sequencing across the genome, including non-coding regions, with improved detection of structural and copy-number changes."}
+ {:id :cg/DenaturingGradientGel,
+  :type :skos/Concept
+  :description "Denaturing gradient gel electrophoresis; screens amplicons for unknown variants by mobility differences arising from sequence-dependent melting behavior."}
+ {:id :cg/HomozygosityMapping,
+  :type :skos/Concept
+  :description "Identification of shared runs of homozygosity in affected individuals from consanguineous families, used to localize recessive disease loci."}
+ {:id :cg/HighResolutionMelting,
+  :type :skos/Concept
+  :description "Post-PCR melt-curve analysis with a saturating dye; screens amplicons for heteroduplexes indicating sequence differences."}
  {:id :obo/MI_0933,
   :description "Diverging genetic interaction, offered when curating protein
       interaction evidence as the negative genetic interaction type: two
