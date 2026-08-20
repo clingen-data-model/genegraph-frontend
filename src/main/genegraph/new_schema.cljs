@@ -1316,7 +1316,7 @@
   :description "The same allele is present on both copies of the locus in the proband."}
  {:id :cg/BiallelicCompoundHeterozygous,
   :type :skos/Concept
-  :description "Describes an individual with two causative variants in trans. Similar in concept to “:cg/Heterozygous” but used in the context of curations with semidominant inheritance to distinguish probands with monoallelic causative variants from those with biallelic causative variants."}
+  :description "Describes an individual with two causative variants in trans. Similar in concept to :cg/Heterozygous but used in the context of curations with semidominant inheritance to distinguish probands with monoallelic causative variants from those with biallelic causative variants."}
  {:id :cg/Heterozygous,
   :type :skos/Concept
   :description "Two different alleles at the locus; the variant of interest is present on one of the two copies."}
@@ -1331,7 +1331,7 @@
   :description "Two variants demonstrated, by phasing or parental testing, to lie on opposite copies of the locus."}
  {:id :cg/BiallelicHomozygous,
   :type :skos/Concept
-  :description "A biallelic (recessive) requirement satisfied by the same variant on both alleles."}
+  :description "Describes an individual with the same variant on both alleles. Similar in concept to :cg/Homozygous but used in the context of curations with semidominant inheritance to distinguish probands with monoallelic causative variants from those with biallelic causative variants."}
  {:id :cg/GenePanels,
   :type :skos/Concept
   :description "Targeted next-generation sequencing of a predefined set of disease-relevant genes."}
