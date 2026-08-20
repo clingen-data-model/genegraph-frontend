@@ -279,11 +279,7 @@
   :value-set :cg/VariantOriginValueSet
   :maturity :cg/Draft}
  {:id :cg/calculatedClassification
-  :description "The classification assigned automatically from the summed
-      points: Limited for 0.1-6, Moderate for 7-11, and Strong or Definitive
-      for 12-18. An expert panel may modify it by at most one level, except
-      that Disputed and Refuted may be chosen regardless of the calculated
-      value."
+  :description "The classification assigned automatically from the summed points: Limited (>= 0.10 and <6.50), Moderate (>=6.50 and <11.50), Strong (>=11.50) or Definitive (>=11.50 & replication over time). An expert panel may modify it by at most one level, except that Disputed and Refuted may be chosen regardless of the calculated value."
   :type :rdf/Property
   :maturity :cg/Internal
   :range :skos/Concept
@@ -1027,7 +1023,7 @@
   :description "The gene-disease relationship is considered plausible by
       experts but the evidence is insufficient to score as Moderate, for
       example a small number of cases with well-defined phenotypes and
-      plausible variants. Requires 0.1-6 points. Not to be applied where
+      plausible variants. Requires a score <= 0.10 and < 6.50 points. Not to be applied where
       none of the presented evidence is compelling, in which case Disputed
       should be considered."
   :type :skos/Concept}
@@ -1035,7 +1031,7 @@
   :description "The role of the gene in disease has been independently
       demonstrated in at least two separate studies, with considerable
       genetic evidence from numerous unrelated probands and no convincing
-      contradictory evidence. Requires at least 12 points but without
+      contradictory evidence. Requires at least 11.50 points but without
       replication over time."
   :type :skos/Concept}
  {:id :cg/Definitive,
@@ -1043,7 +1039,7 @@
       demonstrated in both research and clinical diagnostic settings and
       upheld over time, generally at least two independent scored
       publications of human genetic evidence over at least three years.
-      Requires 12-18 points together with replication over time, and no
+      Requires at least 11.50 points together with replication over time, and no
       convincing contradictory evidence."
   :type :skos/Concept}
  {:id :cg/NoKnownDiseaseRelationship,
@@ -1059,22 +1055,7 @@
       the disease, typically some convincing genetic evidence with or
       without supporting experimental data. The relationship may not have
       been independently reported, but no convincing contradictory evidence
-      has emerged. Requires 7-11 points."
-  :type :skos/Concept}
- {:id :cg/Limited,
-  :description "The gene-disease relationship is considered plausible by
-      experts but the evidence is insufficient to score as Moderate, for
-      example a small number of cases with well-defined phenotypes and
-      plausible variants. Requires 0.1-6 points. Not to be applied where
-      none of the presented evidence is compelling, in which case Disputed
-      should be considered."
-  :type :skos/Concept}
- {:id :cg/Strong,
-  :description "The role of the gene in disease has been independently
-      demonstrated in at least two separate studies, with considerable
-      genetic evidence from numerous unrelated probands and no convincing
-      contradictory evidence. Requires at least 12 points but without
-      replication over time."
+      has emerged. Requires a score <= 6.50 and < 11.50 points."
   :type :skos/Concept}
  {:id :cg/Refuted,
   :description "Evidence refuting the reported role of the gene in the
@@ -1083,36 +1064,13 @@
       later found to have an alternative cause of disease or not to have the
       disease in question."
   :type :skos/Concept}
- {:id :cg/Definitive,
-  :description "The role of the gene in the disease has been repeatedly
-      demonstrated in both research and clinical diagnostic settings and
-      upheld over time, generally at least two independent scored
-      publications of human genetic evidence over at least three years.
-      Requires 12-18 points together with replication over time, and no
-      convincing contradictory evidence."
-  :type :skos/Concept}
- {:id :cg/NoKnownDiseaseRelationship,
-  :description "No evidence for a causal role of the gene in the disease of
-      interest has been reported in the literature or public databases. The
-      gene may be a candidate based on linkage intervals, animal models, or
-      pathway membership, but no report has directly implicated it in the
-      specified disease. This category was known as No Reported Evidence
-      prior to August 2019."
-  :type :skos/Concept}
  {:id :cg/Disputed,
   :description "An assertion of a gene-disease relationship exists, but the
       initial evidence is not compelling from today's perspective or
       conflicting evidence has arisen, for example where all reported cases
       score zero on expert review or the reported variants prove too common
       in the population."
-  :type :skos/Concept}
- {:id :cg/Moderate,
-  :description "There is moderate evidence for a causal role of the gene in
-      the disease, typically some convincing genetic evidence with or
-      without supporting experimental data. The relationship may not have
-      been independently reported, but no convincing contradictory evidence
-      has emerged. Requires 7-11 points."
-  :type :skos/Concept}
+  :type :skos/Concept} 
  {:id :cg/RecurationFrameworkChange,
   :description "The curation was reevaluated to be consistent with a newer
       version of the curation framework (e.g. SOP, specification, etc.)."
@@ -1155,18 +1113,12 @@
  {:id :cg/Neutral,
   :type :skos/Concept
   :description "The evidence is neutral with respect to the proposition."}
- {:id :cg/Supports,
-  :description "The evidence supports the proposition."
-  :type :skos/Concept}
  {:id :cg/Disputes,
   :description "The evidence contradicts the proposition and may bring the
       gene-disease relationship into question. Evidence in this direction
       cannot be assigned a score but is flagged as contradictory evidence
       for expert review."
   :type :skos/Concept}
- {:id :cg/Neutral,
-  :type :skos/Concept
-  :description "The evidence is neutral with respect to the proposition."}
  {:id :cg/Supports,
   :description "The evidence supports the proposition."
   :type :skos/Concept}
@@ -1174,9 +1126,6 @@
   :description "The individual or cohort is reported as not Hispanic or
       Latino. Ethnicity is recorded separately from race in the curation
       interface."
-  :type :skos/Concept}
- {:id :cg/Unknown,
-  :description "No value was reported in the source publication."
   :type :skos/Concept}
  {:id :cg/HispanicOrLatino,
   :description "The individual or cohort is reported as Hispanic or Latino.
@@ -1186,7 +1135,7 @@
   :type :skos/Concept
   :description "The biological sex of the individual is ambiguous."}
  {:id :cg/Unknown,
-  :description "No value was reported in the source publication."
+  :description "The value is not known with the infomation available."
   :type :skos/Concept}
  {:id :cg/Other,
   :description "A value not covered by the other options in the set."
@@ -1202,7 +1151,7 @@
   :description "The biological sex of the individual is female. The individual identifies as male."}
  {:id :cg/TransFemale
   :type :skos/Concept
-  :description "The biological sex of the individual is male The individual identifies as female."}
+  :description "The biological sex of the individual is male. The individual identifies as female."}
  {:id :cg/Intersex
   :type :skos/Concept
   :description "An individual with both male and female sexual traits and organs."}
@@ -1367,7 +1316,7 @@
   :description "The same allele is present on both copies of the locus in the proband."}
  {:id :cg/BiallelicCompoundHeterozygous,
   :type :skos/Concept
-  :description "A biallelic (recessive) requirement satisfied by two different variants, one on each allele."}
+  :description "Describes an individual with two causative variants in trans. Similar in concept to “:cg/Heterozygous” but used in the context of curations with semidominant inheritance to distinguish probands with monoallelic causative variants from those with biallelic causative variants."}
  {:id :cg/Heterozygous,
   :type :skos/Concept
   :description "Two different alleles at the locus; the variant of interest is present on one of the two copies."}
@@ -1376,7 +1325,7 @@
   :description "Only one copy of the locus is present, so the variant is unpaired — typically an X- or Y-linked locus in a 46,XY individual, or a locus where the homologous copy is deleted."}
  {:id :cg/MonoallelicHeterozygous,
   :type :skos/Concept
-  :description "A biallelic (recessive) requirement satisfied by a different variant on both alleles."}
+  :description "Describes an individual with one causative variant. Used in the context of curations with semidominant inheritance to distinguish probands with monoallelic causative variants from those with biallelic causative variants."}
  {:id :cg/TwoVariantsInTrans,
   :type :skos/Concept
   :description "Two variants demonstrated, by phasing or parental testing, to lie on opposite copies of the locus."}
@@ -1407,9 +1356,6 @@
  {:id :cg/LinkageAnalysis,
   :type :skos/Concept
   :description "Statistical analysis of co-segregation between marker loci and phenotype across families; localizes a disease locus rather than identifying a causal variant."}
- {:id :cg/Other,
-  :description "A value not covered by the other options in the set."
-  :type :skos/Concept}
  {:id :cg/PCR,
   :type :skos/Concept
   :description "Targeted amplification of a genomic region; used on its own for sizing assays such as repeat expansions or deletion detection, and as a prerequisite step for most other targeted methods."}
